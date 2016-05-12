@@ -25,5 +25,24 @@ docker运行容器：
       docker inspect --format "{{ .State.Pid }}" {container_id}
     通过该pid连接容器：参数参见nsenter --help
        nsenter --target {pid} --mount --uts --ipc --net --pid
-         
-       
+导出容器：
+  docker export {container_id} > {my_image_name}    
+删除停止运行的容器：
+  docker rm {container_id}
+
+Docker 数据管理主要为一下两种:
+  数据卷（Data volumes）
+  数据卷容器（Data volume containers）   
+挂载一个主机目录作为数据卷：
+  sudo docker run -d -P --name web -v /node:/container {image_name}  python app.py
+    -v  /node:/container:ro   #只读挂载
+数据卷容器：其实就是一个正常的容器，专门用来提供数据卷供其它容器挂载的。
+  1、首先参见一个容器，命名为db：
+    sudo docker run -d  -v /dbdata --name db {image_name}
+  2、在其他容器中使用 --volumes-from 来挂载 db 容器中的数据卷：
+    docker run -d --volumes-from db --name db2 {image_name}
+数据卷容器的备份、恢复：
+   docker run --volumes-from db -v $(pwd):/backup  {image_name}  tar cvf /backup/backup.tar /db
+   
+
+
