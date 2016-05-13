@@ -278,4 +278,28 @@ curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"userna
     ]
 }
 通过返回值可以看到vm tenant中共包含hoo、test 两个实例。
-
+ curl -g -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9  -H "content-type: application/json" -H "X-Auth-Token: 2d8f7f05530349abac4ee6b0cb9022bf" |python -mjson.tool
+ {
+    "flavor": {
+        "OS-FLV-DISABLED:disabled": false,
+        "OS-FLV-EXT-DATA:ephemeral": 0,
+        "disk": 50,
+        "id": "0867a43b-3c58-4246-99ce-b316045563d9",
+        "links": [
+            {
+                "href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9",
+                "rel": "self"
+            },
+            {
+                "href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9",
+                "rel": "bookmark"
+            }
+        ],
+        "name": "cpu_2_mem_2G_disk_50G_sys",
+        "os-flavor-access:is_public": true,
+        "ram": 2048,
+        "rxtx_factor": 1.0,
+        "swap": "",
+        "vcpus": 2
+    }
+}
