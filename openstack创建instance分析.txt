@@ -1,46 +1,52 @@
 1、先找到模板id：nova flavor-list
 2、找到镜像id： nova images-list
 3、再需要找到网络id：nova network-list
-[root@SJ-E8-Cloud115 ~(keystone_admin)]# nova --debug boot chengpeng --flavor  0867a43b-3c58-4246-99ce-b316045563d9  --image  b28e03d9-6c19-425b-ba3a-0d3bcab0e810  --nic net-id=7d59424c-fe23-4603-8916-fabe3b68d363 
-
+[root@SJ-E8-Cloud115 ~(keystone_admin)]# nova --debug boot chengpeng_test --flavor 0867a43b-3c58-4246-99ce-b316045563d9 --image b28e03d9-6c19-425b-ba3a-0d3bcab0e810 --nic net-id=0d04e96c-ed58-4324-aaa6-65bd0b8160c3
 DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:5000/v2.0 -H "Accept: application/json" -H "User-Agent: python-keystoneclient"
 INFO (connectionpool:203) Starting new HTTP connection (1): 192.168.39.115
 DEBUG (connectionpool:383) "GET /v2.0 HTTP/1.1" 200 340
-DEBUG (session:224) RESP: [200] content-length: 340 vary: X-Auth-Token server: Apache/2.4.6 (CentOS) connection: close date: Fri, 13 May 2016 03:08:59 GMT content-type: application/json x-openstack-request-id: req-27f34bf4-fad4-4410-a00d-9738e86a33d0 
+DEBUG (session:224) RESP: [200] content-length: 340 vary: X-Auth-Token server: Apache/2.4.6 (CentOS) connection: close date: Fri, 13 May 2016 03:26:23 GMT content-type: application/json x-openstack-request-id: req-df9590d9-b1ee-4841-ab57-1ba319ae3c4c 
 RESP BODY: {"version": {"status": "stable", "updated": "2014-04-17T00:00:00Z", "media-types": [{"base": "application/json", "type": "application/vnd.openstack.identity-v2.0+json"}], "id": "v2.0", "links": [{"href": "http://192.168.39.115:5000/v2.0/", "rel": "self"}, {"href": "http://docs.openstack.org/", "type": "text/html", "rel": "describedby"}]}}
 
 DEBUG (v2:76) Making authentication request to http://192.168.39.115:5000/v2.0/tokens
 INFO (connectionpool:238) Resetting dropped connection: 192.168.39.115
 DEBUG (connectionpool:383) "POST /v2.0/tokens HTTP/1.1" 200 3345
-DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6"
+#######d40f594067e548148084be98dd48f9ed : admin的tenant_id
+#######b28e03d9-6c19-425b-ba3a-0d3bcab0e810 : image_id
+#查看该images id是否存在
+
+DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e"
 INFO (connectionpool:203) Starting new HTTP connection (1): 192.168.39.115
 DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 HTTP/1.1" 200 731
-DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:08:59 GMT connection: keep-alive content-type: application/json content-length: 731 x-compute-request-id: req-6b0e7eeb-ca28-49b6-8384-90dbc3dfad6b 
+DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:26:23 GMT connection: keep-alive content-type: application/json content-length: 731 x-compute-request-id: req-8257200e-3b07-466e-9c3c-66c8c937d387 
+#返回值
 RESP BODY: {"image": {"status": "ACTIVE", "updated": "2016-05-12T10:43:07Z", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "bookmark"}, {"href": "http://192.168.39.115:9292/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "type": "application/vnd.openstack.image", "rel": "alternate"}], "id": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "OS-EXT-IMG-SIZE:size": 21474836480, "name": "RHEL_7.1_x86-Public", "created": "2016-04-20T03:46:59Z", "minDisk": 0, "progress": 100, "minRam": 0, "metadata": {"hw_qemu_guest_agent": "no"}}}
 
-DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6"
+#查看该flavor id是否存在
+DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e"
 DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 HTTP/1.1" 200 551
-DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:08:59 GMT connection: keep-alive content-type: application/json content-length: 551 x-compute-request-id: req-8fc6eba0-ccd5-4618-8668-73ce52f02c93 
+DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:26:23 GMT connection: keep-alive content-type: application/json content-length: 551 x-compute-request-id: req-30de4dbf-3536-41df-84a7-381b10e76657 
+#返回
 RESP BODY: {"flavor": {"name": "cpu_2_mem_2G_disk_50G_sys", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "bookmark"}], "ram": 2048, "OS-FLV-DISABLED:disabled": false, "vcpus": 2, "swap": "", "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "OS-FLV-EXT-DATA:ephemeral": 0, "disk": 50, "id": "0867a43b-3c58-4246-99ce-b316045563d9"}}
 
-DEBUG (session:195) REQ: curl -g -i -X POST http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers -H "User-Agent: python-novaclient" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6" -d '{"server": {"name": "chengpeng", "imageRef": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "flavorRef": "0867a43b-3c58-4246-99ce-b316045563d9", "max_count": 1, "min_count": 1, "networks": [{"uuid": "7d59424c-fe23-4603-8916-fabe3b68d363"}]}}'
+DEBUG (session:195) REQ: curl -g -i -X POST http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers -H "User-Agent: python-novaclient" -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e" -d '{"server": {"name": "chengpeng_test", "imageRef": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "flavorRef": "0867a43b-3c58-4246-99ce-b316045563d9", "max_count": 1, "min_count": 1, "networks": [{"uuid": "0d04e96c-ed58-4324-aaa6-65bd0b8160c3"}]}}'
 DEBUG (connectionpool:383) "POST /v2/d40f594067e548148084be98dd48f9ed/servers HTTP/1.1" 202 445
-DEBUG (session:224) RESP: [202] content-length: 445 x-compute-request-id: req-5c2e961f-6ad6-40c3-addd-c04f8ec9e4dd connection: keep-alive location: http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01 date: Fri, 13 May 2016 03:09:00 GMT content-type: application/json 
-RESP BODY: {"server": {"security_groups": [{"name": "default"}], "OS-DCF:diskConfig": "MANUAL", "id": "4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "rel": "bookmark"}], "adminPass": "Giantcloud007"}}
+DEBUG (session:224) RESP: [202] content-length: 445 x-compute-request-id: req-ed0aa83e-6506-4a2c-8d6f-790a8e98cbab connection: keep-alive location: http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf date: Fri, 13 May 2016 03:26:24 GMT content-type: application/json 
+RESP BODY: {"server": {"security_groups": [{"name": "default"}], "OS-DCF:diskConfig": "MANUAL", "id": "a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "rel": "bookmark"}], "adminPass": "Giantcloud007"}}
 
-DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6"
-DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01 HTTP/1.1" 200 1508
-DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:09:00 GMT connection: keep-alive content-type: application/json content-length: 1508 x-compute-request-id: req-5014f391-3171-423d-b29e-edf85847fb93 
-RESP BODY: {"server": {"status": "BUILD", "updated": "2016-05-13T03:09:00Z", "hostId": "", "OS-EXT-SRV-ATTR:host": null, "addresses": {}, "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/servers/4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "rel": "bookmark"}], "key_name": null, "image": {"id": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "links": [{"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "bookmark"}]}, "OS-EXT-STS:task_state": "scheduling", "OS-EXT-STS:vm_state": "building", "OS-EXT-SRV-ATTR:instance_name": "instance-0000007b", "OS-SRV-USG:launched_at": null, "OS-EXT-SRV-ATTR:hypervisor_hostname": null, "flavor": {"id": "0867a43b-3c58-4246-99ce-b316045563d9", "links": [{"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "bookmark"}]}, "id": "4d3dbba4-19aa-44e4-828e-b8a06d3f8e01", "OS-SRV-USG:terminated_at": null, "OS-EXT-AZ:availability_zone": "BACKUP", "user_id": "07c1d92374a54135b949a2461891e274", "name": "chengpeng", "created": "2016-05-13T03:09:00Z", "tenant_id": "d40f594067e548148084be98dd48f9ed", "OS-DCF:diskConfig": "MANUAL", "os-extended-volumes:volumes_attached": [], "accessIPv4": "", "accessIPv6": "", "progress": 0, "OS-EXT-STS:power_state": 0, "config_drive": "", "metadata": {}}}
+DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e"
+DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf HTTP/1.1" 200 1513
+DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:26:24 GMT connection: keep-alive content-type: application/json content-length: 1513 x-compute-request-id: req-07b319b7-e036-4cde-b62b-1363cca217bb 
+RESP BODY: {"server": {"status": "BUILD", "updated": "2016-05-13T03:26:24Z", "hostId": "", "OS-EXT-SRV-ATTR:host": null, "addresses": {}, "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/servers/a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "rel": "bookmark"}], "key_name": null, "image": {"id": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "links": [{"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "bookmark"}]}, "OS-EXT-STS:task_state": "scheduling", "OS-EXT-STS:vm_state": "building", "OS-EXT-SRV-ATTR:instance_name": "instance-0000007c", "OS-SRV-USG:launched_at": null, "OS-EXT-SRV-ATTR:hypervisor_hostname": null, "flavor": {"id": "0867a43b-3c58-4246-99ce-b316045563d9", "links": [{"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "bookmark"}]}, "id": "a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf", "OS-SRV-USG:terminated_at": null, "OS-EXT-AZ:availability_zone": "BACKUP", "user_id": "07c1d92374a54135b949a2461891e274", "name": "chengpeng_test", "created": "2016-05-13T03:26:24Z", "tenant_id": "d40f594067e548148084be98dd48f9ed", "OS-DCF:diskConfig": "MANUAL", "os-extended-volumes:volumes_attached": [], "accessIPv4": "", "accessIPv6": "", "progress": 0, "OS-EXT-STS:power_state": 0, "config_drive": "", "metadata": {}}}
 
-DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6"
+DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e"
 DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 HTTP/1.1" 200 551
-DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:09:00 GMT connection: keep-alive content-type: application/json content-length: 551 x-compute-request-id: req-f10e9908-181d-4023-a32d-f2f7e2d72597 
+DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:26:24 GMT connection: keep-alive content-type: application/json content-length: 551 x-compute-request-id: req-66f580ac-5f0a-4c43-9bdd-64d98f29f687 
 RESP BODY: {"flavor": {"name": "cpu_2_mem_2G_disk_50G_sys", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9", "rel": "bookmark"}], "ram": 2048, "OS-FLV-DISABLED:disabled": false, "vcpus": 2, "swap": "", "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "OS-FLV-EXT-DATA:ephemeral": 0, "disk": 50, "id": "0867a43b-3c58-4246-99ce-b316045563d9"}}
 
-DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}9f9959e48a027cf8d67d2cb985b16d40e95559d6"
+DEBUG (session:195) REQ: curl -g -i -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 -H "User-Agent: python-novaclient" -H "Accept: application/json" -H "X-Auth-Token: {SHA1}54b46535657d3b407935d3c3339dd2f778334e5e"
 DEBUG (connectionpool:383) "GET /v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810 HTTP/1.1" 200 731
-DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:09:00 GMT connection: keep-alive content-type: application/json content-length: 731 x-compute-request-id: req-c7a37e8a-0666-427c-861f-291c4cd82a88 
+DEBUG (session:224) RESP: [200] date: Fri, 13 May 2016 03:26:24 GMT connection: keep-alive content-type: application/json content-length: 731 x-compute-request-id: req-36e9edfc-28ff-4872-b0a4-cbdef673f8bd 
 RESP BODY: {"image": {"status": "ACTIVE", "updated": "2016-05-12T10:43:07Z", "links": [{"href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "self"}, {"href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "rel": "bookmark"}, {"href": "http://192.168.39.115:9292/images/b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "type": "application/vnd.openstack.image", "rel": "alternate"}], "id": "b28e03d9-6c19-425b-ba3a-0d3bcab0e810", "OS-EXT-IMG-SIZE:size": 21474836480, "name": "RHEL_7.1_x86-Public", "created": "2016-04-20T03:46:59Z", "minDisk": 0, "progress": 100, "minRam": 0, "metadata": {"hw_qemu_guest_agent": "no"}}}
 
 +--------------------------------------+------------------------------------------------------------------+
@@ -50,7 +56,7 @@ RESP BODY: {"image": {"status": "ACTIVE", "updated": "2016-05-12T10:43:07Z", "li
 | OS-EXT-AZ:availability_zone          | BACKUP                                                           |
 | OS-EXT-SRV-ATTR:host                 | -                                                                |
 | OS-EXT-SRV-ATTR:hypervisor_hostname  | -                                                                |
-| OS-EXT-SRV-ATTR:instance_name        | instance-0000007b                                                |
+| OS-EXT-SRV-ATTR:instance_name        | instance-0000007c                                                |
 | OS-EXT-STS:power_state               | 0                                                                |
 | OS-EXT-STS:task_state                | scheduling                                                       |
 | OS-EXT-STS:vm_state                  | building                                                         |
@@ -60,19 +66,20 @@ RESP BODY: {"image": {"status": "ACTIVE", "updated": "2016-05-12T10:43:07Z", "li
 | accessIPv6                           |                                                                  |
 | adminPass                            | Giantcloud007                                                    |
 | config_drive                         |                                                                  |
-| created                              | 2016-05-13T03:09:00Z                                             |
+| created                              | 2016-05-13T03:26:24Z                                             |
 | flavor                               | cpu_2_mem_2G_disk_50G_sys (0867a43b-3c58-4246-99ce-b316045563d9) |
 | hostId                               |                                                                  |
-| id                                   | 4d3dbba4-19aa-44e4-828e-b8a06d3f8e01                             |
+| id                                   | a0c420f4-e0a7-49e3-ab29-ddd9ce23e0cf                             |
 | image                                | RHEL_7.1_x86-Public (b28e03d9-6c19-425b-ba3a-0d3bcab0e810)       |
 | key_name                             | -                                                                |
 | metadata                             | {}                                                               |
-| name                                 | chengpeng                                                        |
+| name                                 | chengpeng_test                                                   |
 | os-extended-volumes:volumes_attached | []                                                               |
 | progress                             | 0                                                                |
 | security_groups                      | default                                                          |
 | status                               | BUILD                                                            |
 | tenant_id                            | d40f594067e548148084be98dd48f9ed                                 |
-| updated                              | 2016-05-13T03:09:00Z                                             |
+| updated                              | 2016-05-13T03:26:24Z                                             |
 | user_id                              | 07c1d92374a54135b949a2461891e274                                 |
 +--------------------------------------+------------------------------------------------------------------+
+
