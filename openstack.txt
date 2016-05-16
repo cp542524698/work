@@ -2,7 +2,8 @@
 222.73.155.(059+1) 简短6位密码
 
 获取X-Auth-Token（token id)值，然后使用这个认证的值调用相关的api接口。如下过程：
-curl -k -X POST -v http://0.0.0.0:5000/v2.0/tokens -d '{"auth":{"passwordCredentials":{"username":"admin", "password":"be5e5bf0ce0b542fe"}}}'  -H "Content-type:application/json"   |python -mjson.tool
+curl -k -X POST -v http://0.0.0.0:5000/v2.0/tokens -d '{"auth":{"passwordCredentials":{"username":"admin", "password"
+:"be5e5bf0ce0b542fe"}}}'  -H "Content-type:application/json"   |python -mjson.tool
 { [显示结果省略curl -v部分]
     "access": {
         "metadata": {
@@ -53,9 +54,11 @@ curl -X 'GET' -H "X-Auth-Token:c0961e84a60646948608750f3b240aea" -v http://0.0.0
     "tenants_links": []
 }
 
-当你按照api-doc接着调用compute、image、volume等下面的api接口时，会发现统统没有返回值，经过一段时间的摸索，发现对下剩下的api接口是需要使用认证过的token才能使用的；
+当你按照api-doc接着调用compute、image、volume等下面的api接口时，会发现统统没有返回值，经过一段时间的摸索，发现对下剩下的api接口
+是需要使用认证过的token才能使用的；
 再次获取认证过的token：
-curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"username":"admin", "password":"be5e5bf0ce0b542fe"}}}' -H "Content-type:application/json" http://0.0.0.0:35357/v2.0/tokens |python -mjson.tool
+curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"username":"admin", "password":"be5e5bf0ce0b542fe"}}}' 
+-H "Content-type:application/json" http://0.0.0.0:35357/v2.0/tokens |python -mjson.tool
 {
     "access": {
         "metadata": {
@@ -244,7 +247,8 @@ curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"userna
     }
 }
 使用返回的token id和tenant id调用api返回该tenant下的servers
- curl -X GET -H "X-Auth-Token:0cfd992bf15b4153a6fca339154a7304"  -H "Content-type:application/json" http://0.0.0.0:8774/v2/d40f594067e548148084be98dd48f9ed/servers |python -mjson.tool
+ curl -X GET -H "X-Auth-Token:0cfd992bf15b4153a6fca339154a7304"  -H "Content-type:application/json" 
+ http://0.0.0.0:8774/v2/d40f594067e548148084be98dd48f9ed/servers |python -mjson.tool
  {
     "servers": [
         {
@@ -278,7 +282,8 @@ curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"userna
     ]
 }
 通过返回值可以看到vm tenant中共包含hoo、test 两个实例。
- curl -g -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9  -H "content-type: application/json" -H "X-Auth-Token: 2d8f7f05530349abac4ee6b0cb9022bf" |python -mjson.tool
+ curl -g -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 
+ -H "content-type: application/json" -H "X-Auth-Token: 2d8f7f05530349abac4ee6b0cb9022bf" |python -mjson.tool
  {
     "flavor": {
         "OS-FLV-DISABLED:disabled": false,
