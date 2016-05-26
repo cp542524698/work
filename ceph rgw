@@ -1,0 +1,16 @@
+1、vim /etc/yum.repos.d/nginx.repo
+    [nginx]
+    name=nginx repo
+    baseurl=http://nginx.org/packages/rhel/7/$basearch/
+    gpgcheck=0
+    enabled=1
+2、yum install ceph-radosgw －y
+3、
+  create keyring：
+   ceph-authtool --create-keyring /etc/ceph/ceph.client.radosgw.keyring
+   chmod +r /etc/ceph/ceph.client.radosgw.keyring
+   
+   ceph-authtool /etc/ceph/ceph.client.radosgw.keyring -n client.radosgw --gen-key
+   ceph-authtool -n client.radosgw --cap osd 'allow rwx' --cap mon 'allow rwx' /etc/ceph/ceph.client.radosgw.keyring
+   ceph -k /etc/ceph/ceph.client.admin.keyring auth add client.radosgw -i /etc/ceph/ceph.client.radosgw.keyring
+   ceph auth list 
