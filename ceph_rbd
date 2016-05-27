@@ -1,0 +1,100 @@
+创建image:
+	就是向rados中写入一些key/value对，记录image的元数据。(必须加--image-format 2)
+	rbd create test --size 10240 --order 22 --pool rbd  --image-format 2
+	生成这两个重要的object：
+	rbd_id.test
+	rbd_header.93e5c2ae8944a
+	rbd_directory
+
+	#rados -p rbd ls
+		rbd_id.test
+		rbd_header.93e5c2ae8944a
+		rbd_directory
+	#rados -p rbd listomapkeys rbd_directory
+		id_93e5c2ae8944a
+		name_test	
+	#rados -p rbd listomapvals rbd_directory
+		id_93e5c2ae8944a
+		value (8 bytes) :
+		0000 : 04 00 00 00 74 65 73 74                         : ....test
+
+		name_test
+		value (17 bytes) :
+		0000 : 0d 00 00 00 39 33 65 35 63 32 61 65 38 39 34 34 : ....93e5c2ae8944
+		0010 : 61                                              : a
+    # rados -p rbd listomapkeys rbd_id.test
+    # rados -p rbd listomapvals rbd_id.test
+
+    #rados -p rbd listomapkeys  rbd_header.93e5c2ae8944a
+		features
+		object_prefix
+		order
+		size
+		snap_seq
+	
+	# rados -p rbd listomapvals  rbd_header.93e5c2ae8944a
+		features
+		value (8 bytes) :
+		0000 : 01 00 00 00 00 00 00 00                         : ........
+
+		object_prefix
+		value (26 bytes) :
+		0000 : 16 00 00 00 72 62 64 5f 64 61 74 61 2e 39 33 65 : ....rbd_data.93e
+		0010 : 35 63 32 61 65 38 39 34 34 61                   : 5c2ae8944a
+
+		order
+		value (1 bytes) :
+		0000 : 16                                              : .
+
+		size
+		value (8 bytes) :
+		0000 : 00 00 00 80 02 00 00 00                         : ........
+
+		snap_seq
+		value (8 bytes) :
+		0000 : 00 00 00 00 00 00 00 00                         : ........
+
+
+Image的更新就比较简单了，就是更新如上的元数据。
+比如resize操作，就是修改rbd_header. 1d3e74b0dc51的size属性。
+		快照：
+			rbd snap create --snap test.snap --image test -p rbd
+		查看变化：
+		#rados -p rbd listomapkeys  rbd_header.93e5c2ae8944a
+			features
+			object_prefix
+			order
+			size
+			snap_seq
+			snapshot_0000000000000004         ------新增
+		#rados -p rbd listomapvals  rbd_header.93e5c2ae8944a
+			features
+			value (8 bytes) :
+			0000 : 01 00 00 00 00 00 00 00                         : ........
+
+			object_prefix
+			value (26 bytes) :
+			0000 : 16 00 00 00 72 62 64 5f 64 61 74 61 2e 39 33 65 : ....rbd_data.93e
+			0010 : 35 63 32 61 65 38 39 34 34 61                   : 5c2ae8944a
+
+			order
+			value (1 bytes) :
+			0000 : 16                                              : .
+
+			size
+			value (8 bytes) :
+			0000 : 00 00 00 80 02 00 00 00                         : ........
+
+			snap_seq
+			value (8 bytes) :
+			0000 : 04 00 00 00 00 00 00 00                         : ........
+
+			snapshot_0000000000000004
+			value (86 bytes) :
+			0000 : 04 01 50 00 00 00 04 00 00 00 00 00 00 00 09 00 : ..P.............
+			0010 : 00 00 74 65 73 74 2e 73 6e 61 70 00 00 00 80 02 : ..test.snap.....
+			0020 : 00 00 00 01 00 00 00 00 00 00 00 01 01 1c 00 00 : ................
+			0030 : 00 ff ff ff ff ff ff ff ff 00 00 00 00 fe ff ff : ................
+			0040 : ff ff ff ff ff 00 00 00 00 00 00 00 00 00 00 00 : ................
+			0050 : 00 00 00 00 00 00                               : ......
+			
