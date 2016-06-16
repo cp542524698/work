@@ -1,9 +1,9 @@
-创建image:
+创建image:（--image-format 2格式）
 	就是向rados中写入一些key/value对，记录image的元数据。(必须加--image-format 2)
 	rbd create test --size 10240 --order 22 --pool rbd  --image-format 2
 	生成这两个重要的object：
-	rbd_id.test
-	rbd_header.93e5c2ae8944a
+	rbd_id.test  						---- rbd_id.{image name}
+	rbd_header.93e5c2ae8944a			---- rbd_header.{image id}
 	rbd_directory
 
 	#rados -p rbd ls
@@ -14,7 +14,7 @@
 		id_93e5c2ae8944a
 		name_test	
 	#rados -p rbd listomapvals rbd_directory
-		id_93e5c2ae8944a
+		id_93e5c2ae8944a                         	    ---- image id
 		value (8 bytes) :
 		0000 : 04 00 00 00 74 65 73 74                         : ....test
 
@@ -22,15 +22,40 @@
 		value (17 bytes) :
 		0000 : 0d 00 00 00 39 33 65 35 63 32 61 65 38 39 34 34 : ....93e5c2ae8944
 		0010 : 61                                              : a
+    看见：rbd_directory 保存了image name和id的映射信息
+    
     # rados -p rbd listomapkeys rbd_id.test
     # rados -p rbd listomapvals rbd_id.test
-
+	# rados -p rbd stat rbd_id.test
+	rbd/rbd_id.test mtime 2016-06-16 15:14:52.000000, size 17 
+	#rados -p rbd get rbd_id.test 1.txt
+	#cat  1.txt
+	93e5c2ae8944a			#image id
+	
+	rbd_id磁盘上对象的格式为：rbd\uid.{image name}__head_{hash poolid}
+	# ceph osd map rbd rbd_id.test
+	osdmap e1474 pool 'rbd' (16) object 'rbd_id.test' -> pg 16.9a2f7478 (16.18) -> up ([7,3], p7) acting ([7,3], p7)
+	该obj位于pg（16.9a2f7478）上，即16.18_head目录下；/var/lib/ceph/osd/ceph-3/current/16.18_head
+	# ll
+	总用量 8
+	-rw-r--r-- 1 root root  0 6月   3 16:17 __head_00000018__10
+	-rw-r--r-- 1 root root 17 6月  16 15:14 rbd\uid.test__head_9A2F7478__10  	-----	 Here
+	#cat rbd\uid.test__head_9A2F7478__10
+	93e5c2ae8944a																-----    image id
+	
+    rbd块的元数据对象 rbd_header.{image id} 	---- 命名规则
+    该对象在磁盘上文件的命名规则为：rbd\uheader.{image id}__head_{hash poolid}
+    信息同上分析：
+    记录rbd image的元数据，其内容包括size，order，object_prefix, snapseq, parent（克隆的image才有）, snapshot{snap id}（各个快照的信息）
+   
     #rados -p rbd listomapkeys  rbd_header.93e5c2ae8944a
 		features
 		object_prefix
 		order
 		size
 		snap_seq
+	
+	下面分别对不同类型的image的rbd_header里的数据进行说明
 	
 	# rados -p rbd listomapvals  rbd_header.93e5c2ae8944a
 		features
@@ -54,6 +79,174 @@
 		value (8 bytes) :
 		0000 : 00 00 00 00 00 00 00 00                         : ........
 
+【摘抄】
+	1）没有快照的image
+		object_prefix：对象的名字前缀
+		order：用来计算block size的，比如22，那么块大小就是1<<22=4MB
+		size：对象大小
+		snap_seq：快照编号，没有快照的时候是0
+	
+		root@ceph1:/var/local/osd/current# rados -p rbd listomapvals rbd_header.12812ae8944a
+		features
+		value: (8 bytes) :
+		0000 : 01 00 00 00 00 00 00 00                         : ........
+		
+		object_prefix
+		value: (25 bytes) :
+		0000 : 15 00 00 00 72 62 64 5f 64 61 74 61 2e 31 32 38 : ....rbd_data.128
+		0010 : 31 32 61 65 38 39 34 34 61                      : 12ae8944a
+		
+		order
+		value: (1 bytes) :
+		0000 : 16                                              : .
+		
+		size
+		value: (8 bytes) :
+		0000 : 00 00 a0 00 00 00 00 00                         : ........
+		
+		snap_seq
+		value: (8 bytes) :
+		0000 : 00 00 00 00 00 00 00 00                         : ........
+	2）做过快照的image
+		object_prefix：对象的名字前缀
+		order：用来计算block size的，比如22，那么块大小就是1<<22=4MB
+		size：对象大小
+		snap_seq：快照编号
+		snapshot_id：记录对应快照的信息
+	
+		root@ceph1:/var/local/osd/current# rados -p rbd listomapvals rbd_header.11ee2ae8944a
+		features
+		value: (8 bytes) :
+		0000 : 01 00 00 00 00 00 00 00                         : ........
+		
+		object_prefix
+		value: (25 bytes) :
+		0000 : 15 00 00 00 72 62 64 5f 64 61 74 61 2e 31 31 65 : ....rbd_data.11e
+		0010 : 65 32 61 65 38 39 34 34 61                      : e2ae8944a
+		
+		order
+		value: (1 bytes) :
+		0000 : 16                                                                            : .
+		
+		size
+		value: (8 bytes) :
+		0000 : 00 00 a0 00 00 00 00 00                         : ........
+		
+		snap_seq
+		value: (8 bytes) :
+		0000 : 03 00 00 00 00 00 00 00                         : ........
+		
+		snapshot_0000000000000002
+		value: (78 bytes) :
+		0000 : 03 01 48 00 00 00 02 00 00 00 00 00 00 00 09 00 : ..H.............
+		0010 : 00 00 6d 79 72 62 64 73 6e 61 70 00 00 a0 00 00 : ..myrbdsnap.....
+		0020 : 00 00 00 01 00 00 00 00 00 00 00 01 01 1c 00 00 : ................
+		0030 : 00 ff ff ff ff ff ff ff ff 00 00 00 00 fe ff ff : ................
+		0040 : ff ff ff ff ff 00 00 00 00 00 00 00 00 02       : ..............
+		
+		snapshot_0000000000000003
+		value: (79 bytes) :
+		0000 : 03 01 49 00 00 00 03 00 00 00 00 00 00 00 0a 00 : ..I.............
+		0010 : 00 00 6d 79 72 62 64 73 6e 61 70 32 00 00 a0 00 : ..myrbdsnap2....
+		0020 : 00 00 00 00 01 00 00 00 00 00 00 00 01 01 1c 00 : ................
+		0030 : 00 00 ff ff ff ff ff ff ff ff 00 00 00 00 fe ff : ................
+		0040 : ff ff ff ff ff ff 00 00 00 00 00 00 00 00 00    : ...............
+	3）从快照克隆的image
+		object_prefix：对象的名字前缀
+		order：用来计算block size的，比如22，那么块大小就是1<<22=4MB
+		size：对象大小
+		snap_seq：快照编号，没有快照的时候是0
+		parent：记录该image的父image的id
+
+		root@ceph1:/var/local/osd/current# rados -p rbd listomapvals rbd_header.123f238e1f29
+		features
+		value: (8 bytes) :
+		0000 : 01 00 00 00 00 00 00 00                         : ........
+		
+		object_prefix
+		value: (25 bytes) :
+		0000 : 15 00 00 00 72 62 64 5f 64 61 74 61 2e 31 32 33 : ....rbd_data.123
+		0010 : 66 32 33 38 65 31 66 32 39                      : f238e1f29
+		
+		order
+		value: (1 bytes) :
+		0000 : 16                                                                           : .
+		
+		parent
+		value: (46 bytes) :
+		0000 : 01 01 28 00 00 00 02 00 00 00 00 00 00 00 0c 00 : ..(.............
+		0010 : 00 00 31 31 65 65 32 61 65 38 39 34 34 61 02 00 : ..11ee2ae8944a..
+		0020 : 00 00 00 00 00 00 00 00 a0 00 00 00 00 00       : ..............
+		
+		size
+		value: (8 bytes) :
+		0000 : 00 00 a0 00 00 00 00 00                         : ........
+		
+		snap_seq
+		value: (8 bytes) :
+		0000 : 00 00 00 00 00 00 00 00                         : ........
+	2.3 rbd_data.{image id}.{offset}
+		rbd_data的对象命名格式为：rbd\udata.{image id}.fragementhead__(snap)_{hashpoolid}
+		对象的命名规则为：
+			block_name_prefix.fragment.head(snap_num)_hashpoolid
+			block_name_prefix：对象名前缀
+			fragment：按照块大小来划分的偏移，比如4MB的块大小，那么000000000000就表示第一个4MB的块
+			head(snap_num)：snapshot版本，如果是head，表示是image的，如果是数字，表示是snapshot的序号
+			hash：由block_nama_prefix计算得到的
+			poolid：image所属的pool id
+		
+		rbd image的数据对象，存放具体的数据内容
+		root@ceph2:/var/local/osd/current# ls *head -la|grep data
+		-rw-r--r--   1 root root 1048576 Oct 19 10:47 rbd\udata.11ee2ae8944a.0000000000000000__2_88F8F929__2
+		-rw-r--r--   1 root root 4194304 Oct 19 11:37 rbd\udata.11ee2ae8944a.0000000000000000__3_88F8F929__2
+		-rw-r--r--   1 root root 4194304 Oct 19 11:37 rbd\udata.11ee2ae8944a.0000000000000000__head_88F8F929__2
+		-rw-r--r--   1 root root 4194304 Oct 19 11:37 rbd\udata.11ee2ae8944a.0000000000000001__3_0F1C4EFE__2
+		-rw-r--r--   1 root root 4194304 Oct 19 11:37 rbd\udata.11ee2ae8944a.0000000000000001__head_0F1C4EFE__2
+	
+	2.4 rbd_directory
+		rbd_directory对象的命名格式为：rbd\udirectoryhead_hashpoolid
+		root@ceph1:/var/local/osd/current# ls *head -la|grep directory
+		-rw-r--r--   1 root root    8 Oct 19 10:22 rbd\udirectory__head_30A98C1C__2
+		这个对象里面包含对应存储池里所有的image的name和id的双向映射
+		root@ceph1:/var/local/osd/current# rados -p rbd listomapvals rbd_directory
+		id_11ee2ae8944a
+		value: (9 bytes) :
+		0000 : 05 00 00 00 6d 79 72 62 64                      : ....myrbd
+		
+		id_123f238e1f29
+		value: (19 bytes) :
+		0000 : 0f 00 00 00 6d 79 72 62 64 73 6e 61 70 63 6c 6f : ....myrbdsnapclo
+		0010 : 6e 65 31                                        : ne1
+		
+		id_12812ae8944a
+		value: (10 bytes) :
+		0000 : 06 00 00 00 6d 79 72 62 64 32                   : ....myrbd2
+		
+		name_myrbd
+		value: (16 bytes) :
+		0000 : 0c 00 00 00 31 31 65 65 32 61 65 38 39 34 34 61 : ....11ee2ae8944a
+		
+		name_myrbd2
+		value: (16 bytes) :
+		0000 : 0c 00 00 00 31 32 38 31 32 61 65 38 39 34 34 61 : ....12812ae8944a
+		
+		name_myrbdsnapclone1
+		value: (16 bytes) :
+		0000 : 0c 00 00 00 31 32 33 66 32 33 38 65 31 66 32 39 : ....123f238e1f29
+
+	2.5 rbd_children
+		rbd_children对象命名格式为：rbd\uchildrenhead_hashpoolid
+		root@ceph3:/var/local/osd/current# ls *head -la|grep children 
+		-rw-r--r--   1 root root    0 Oct 19 11:19 rbd\uchildren__head_0FA1CACA__2
+		记录父子关系，key是parent image的id，value是克隆的image的id，用来快速查找确认父子关系的。
+		root@ceph1:/var/local/osd/current# rados -p rbd listomapvals rbd_children 
+		key: (32 bytes):
+		0000 : 02 00 00 00 00 00 00 00 0c 00 00 00 31 31 65 65 : ............11ee
+		0010 : 32 61 65 38 39 34 34 61 02 00 00 00 00 00 00 00 : 2ae8944a........
+		
+		value: (20 bytes) :
+		0000 : 01 00 00 00 0c 00 00 00 31 32 33 66 32 33 38 65 : ........123f238e
+		0010 : 31 66 32 39                                     : 1f29
 
 Image的更新就比较简单了，就是更新如上的元数据。
 比如resize操作，就是修改rbd_header. 1d3e74b0dc51的size属性。
@@ -98,3 +291,19 @@ Image的更新就比较简单了，就是更新如上的元数据。
 			0040 : ff ff ff ff ff 00 00 00 00 00 00 00 00 00 00 00 : ................
 			0050 : 00 00 00 00 00 00                               : ......
 			
+创建image:（--image-format 1格式）
+	# rbd create test --size 10240 --order 22 --pool rbd  
+	# rados -p rbd ls
+	test.rbd
+	rbd_directory
+	其中rbd_directory是保存该存储池里的image列表
+	从下面的命令可以看到对于format 1格式的image，没有将image name和id的映射保存到rbd_directory里
+	#rados -p rbd listomapvals rbd_directory			-- 输出为空
+	# rados -p rbd stat test.rbd
+	rbd/test.rbd mtime 2016-06-16 16:05:16.000000, size 112
+	# rados -p rbd get test.rbd 2.txt
+	# cat 2.txt
+	<<< Rados Block Device Image >>>
+	rb.0.b6a90.2ae8944aRBD001.005					---  部分乱码
+	
+	
