@@ -186,15 +186,7 @@
 		value: (8 bytes) :
 		0000 : 00 00 00 00 00 00 00 00                         : ........
 	2.3 rbd_data.{image id}.{offset}
-		rbd_data的对象命名格式为：rbd\udata.{image id}.fragementhead__(snap)_{hashpoolid}
-		对象的命名规则为：
-			block_name_prefix.fragment.head(snap_num)_hashpoolid
-			block_name_prefix：对象名前缀
-			fragment：按照块大小来划分的偏移，比如4MB的块大小，那么000000000000就表示第一个4MB的块
-			head(snap_num)：snapshot版本，如果是head，表示是image的，如果是数字，表示是snapshot的序号
-			hash：由block_nama_prefix计算得到的
-			poolid：image所属的pool id
-		
+		rbd_data的对象命名格式为：rbd\udata.{image id}.fragement__{head/snap}_{hashpoolid}
 		rbd image的数据对象，存放具体的数据内容
 		root@ceph2:/var/local/osd/current# ls *head -la|grep data
 		-rw-r--r--   1 root root 1048576 Oct 19 10:47 rbd\udata.11ee2ae8944a.0000000000000000__2_88F8F929__2
@@ -306,4 +298,11 @@ Image的更新就比较简单了，就是更新如上的元数据。
 	<<< Rados Block Device Image >>>
 	rb.0.b6a90.2ae8944aRBD001.005					---  部分乱码
 	
+	对象的命名规则为：
+		block_name_prefix.fragment.{ head/snap_num }_{hashpoolid}
+		block_name_prefix：对象名前缀
+		fragment：按照块大小来划分的偏移，比如4MB的块大小，那么000000000000就表示第一个4MB的块
+		head(snap_num)：snapshot版本，如果是head，表示是image的，如果是数字，表示是snapshot的序号
+		hash：由block_nama_prefix计算得到的
+		poolid：image所属的pool id
 	
