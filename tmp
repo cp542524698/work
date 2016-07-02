@@ -1,0 +1,54 @@
+SJ-6-Cloud109
+/dev/sdl1  /var/lib/ceph/osd/ceph-114
+/dev/sdm1  /var/lib/ceph/osd/ceph-115
+原ssd盘符
+
+SJ-6-Cloud108
+/dev/sdh1  /var/lib/ceph/osd/ceph-102
+/dev/sdj1  /var/lib/ceph/osd/ceph-103
+原ssd盘符
+
+
+SJ-6-Cloud107
+/dev/sdm1    /var/lib/ceph/osd/ceph-92
+/dev/sdh1    /var/lib/ceph/osd/ceph-93
+原ssd盘符
+
+
+SJ-6-Cloud106
+/dev/sdb1       3.7T  307G  3.4T    9% /var/lib/ceph/osd/ceph-73
+/dev/sdc1       3.7T  291G  3.4T    8% /var/lib/ceph/osd/ceph-72
+/dev/sdd1       3.7T  280G  3.4T    8% /var/lib/ceph/osd/ceph-71
+
+
+-------------
+SJ-6-Cloud105
+/dev/sdb1       3.7T  249G  3.4T    7% /var/lib/ceph/osd/ceph-62
+/dev/sdc1       3.7T  356G  3.3T   10% /var/lib/ceph/osd/ceph-64
+/dev/sdd1       3.7T  386G  3.3T   11% /var/lib/ceph/osd/ceph-61
+
+SJ-6-Cloud104
+/dev/sdb1       3.7T  287G  3.4T    8% /var/lib/ceph/osd/ceph-51
+/dev/sdc1       3.7T  252G  3.4T    7% /var/lib/ceph/osd/ceph-48
+/dev/sdd1       3.7T  228G  3.5T    7% /var/lib/ceph/osd/ceph-50
+
+SJ-6-Cloud103
+/dev/sdb1       3.7T  312G  3.4T    9% /var/lib/ceph/osd/ceph-36
+/dev/sdc1       3.7T  368G  3.3T   10% /var/lib/ceph/osd/ceph-37
+/dev/sdd1       3.7T  227G  3.5T    7% /var/lib/ceph/osd/ceph-42
+
+SJ-6-Cloud102
+/dev/sdb1       3.7T  233G  3.5T    7% /var/lib/ceph/osd/ceph-24
+/dev/sdc1       3.7T  318G  3.4T    9% /var/lib/ceph/osd/ceph-30
+/dev/sdd1       3.7T  243G  3.5T    7% /var/lib/ceph/osd/ceph-33
+
+
+SJ-6-Cloud101
+/dev/sdb1       3.7T  241G  3.5T    7% /var/lib/ceph/osd/ceph-13
+/dev/sdc1       3.7T  356G  3.3T   10% /var/lib/ceph/osd/ceph-14
+/dev/sdd1       3.7T  303G  3.4T    9% /var/lib/ceph/osd/ceph-16
+
+SJ-6-Cloud100
+/dev/sdb1       3.7T  266G  3.4T    8% /var/lib/ceph/osd/ceph-1
+/dev/sdc1       3.7T  416G  3.3T   12% /var/lib/ceph/osd/ceph-0
+/dev/sdd1       3.7T  243G  3.4T    7% /var/lib/ceph/osd/ceph-7
