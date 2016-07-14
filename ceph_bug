@@ -20,3 +20,9 @@
  1021  root 2016-07-15 06:21:37 : ceph pg repair 1.3c2
  1022  root 2016-07-15 06:21:48 : ceph pg repair  1.2b2
  1023  root 2016-07-15 06:22:01 : ceph pg repair  1.24c
+
+
+[root@SJ-6-Cloud121 ~]# ceph health detail
+HEALTH_ERR 1 pgs inconsistent; 1 scrub errors
+pg 1.2b2 is active+clean+inconsistent, acting [19,34,84]
+1 scrub errors
