@@ -191,3 +191,5 @@ Kubernetes资源规划：
 	rook operator的目标是使用集群来完成自动存储，维持集群的可靠性，维护数据的安全性；operator仅仅运行在当前目录下，
 	我们期待您的反馈以及为将来的版本做出贡献；
 查看更多文档以及简单yaml文件，查看rook githup【https://github.com/rook/rook/tree/master/demo/kubernetes】
+
+http://blog.csdn.net/zqz_qizheng/article/details/56346249
