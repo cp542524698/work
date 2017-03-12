@@ -1,9 +1,11 @@
-实践者Rook：kubernetes中最好的存储
-	在kubernetes的v0.3版正式版中，Rook将原生态的云存储系统通过kubernetes应用的方式与kubernetes进行结合；
-块存储，对象存储，分布式文件系统均可以直接与kuberenete的 application进行整合；
-	Rook使用自动化管理的形式进行管理存储集群，就像传统的意义上的集群管理员的自动管理方法一样；不管怎么说，
-集群管理员都必须掌握安装和监控系统的方法。而集群的运行是完全自动化的，
-	第二，这些操作是以通过第三方资源以kubernetes 扩展的形式存在的；
+
+Rook存储：kubernetes中最优秀的存储
+	在kubernetes v0.3正式版中，Rook将原生态的云存储系统以kubernetes application方式与kubernetes结合；
+块存储，对象存储，分布式文件系统已经直接与kuberenete application进行了融合；
+
+	Rook存储完全自动化地管理着存储集群，这点与传统上的集群管理员的自动管理方式一样；区别在于：
+	首先，传统意义上的集群管理员都必须掌握安装和监控系统。而Rook存储的运行是完全自动化的，
+	再次，Rook存储是以通过第三方资源以kubernetes扩展的形式运行的；
 
 首先，创建一个名为rook-operator.yaml的文件：
 apiVersion: extensions/v1beta1
@@ -26,10 +28,10 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
 
-启动：
+启动Rook存储：
 	kubectl create -f rook-operator.yaml
 
-当deployment运行之后，我们可以开始创建第一个集群了；再次创建yaml文件:
+Rook存储运行起来之后，我们可以开始创建一个存储集群了；再次创建yaml文件:
 	rook-cluster.yaml
 apiVersion: rook.io/v1beta1
 kind: Cluster
@@ -42,12 +44,12 @@ spec:
 开始创建集群：
 	kubectl create -f rook-cluster.yaml
 
-就这样，几分钟的时间，我们就可以拥有存储集群用于kubernetes applications
+就这样，几分钟的时间，我们就拥有用于kubernetes applications的存储集群了；
 
 
-如何使用呢？
+如何使用Rook存储集群呢？
 	声明卷
-	为了使用Rook块存储，我们的应用首先需要创建基于ceph rbd卷插件的存储类型；
+	为了使用Rook块存储，我们kubernetes application首先需要创建基于ceph rbd卷插件的存储类型；
 	rook-storageclass.yaml
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
@@ -64,15 +66,15 @@ parameters:
     userId: rook-rbd-user
     userSecretName: rook-rbd-user
 
-你可能已经注意到了我们需要在yaml文件中写入monitor 节点信息，我们将在下个正式版中简化
-kubernetes的Rook卷插件，然后这是一个很痛苦的过程。
-接下来，我们运行一下命令来声明monitor节点信息：
+你可能已经注意到我们需要在yaml文件中写入monitor节点信息，我们将在下个正式版中简化
+kubernetes的Rook卷插件，虽然这个过程很痛苦。
+但是现如今，我们仍然需要运行以下命令来声明monitor节点信息：
 	export MONS=$(kubectl -n rook get pod mon0 mon1 mon2 -o json|jq ".items[].status.podIP"|tr -d "\""|sed -e 's/$/:6790/'|paste -s -d, -)
 
 最后，我们可以替换yaml文件中的monitor节点信息，并且创建存储类型：
 	sed 's#INSERT_HERE#'$MONS'#' rook-storageclass.yaml | kubectl create -f -
 
-现在，我们可以创建一个卷声明在应用中，例如：
+现在，我们在kuberenetes application中创建一个卷声明，例如：
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -100,12 +102,14 @@ spec:
         persistentVolumeClaim:
           claimName: mysql-pv-claim
 
-这个例子中的yaml中可以从这里【https://github.com/rook/rook/blob/master/demo/kubernetes/mysql.yaml】获得,以及这里【https://github.com/rook/rook/tree/master/demo/kubernetes#consume-the-storage】有更详细的介绍。
+这个例子中的yaml中可以从这里【https://github.com/rook/rook/blob/master/demo/kubernetes/mysql.yaml】获得,以及可以从这里【https://github.com/rook/rook/tree/master/demo/kubernetes#consume-the-storage】获取详细的介绍。
 
-Rook Client
-	连接Rook存储集群的另一个办法是直接使用Rook client容器，该容器提供了简单的直接测试块设备，对象存储以及文件系统
-的基础环境；这并不是指导该这样来使用存储系统，它仅仅提供了用于更加了解kububernetes卷插件原理的一个实验环境而已；
-	执行完上述操作，我们拥有使用rook命令来管理存储集群的基础环境：
+
+Rook存储集群客户端
+	连接Rook存储集群的另一个办法是通过使用Rook 客户端容器，该容器提供了简单的直接测试块设备，对象存储以及文件系统
+的基础环境；然而这并非是说只能这样来运用Rook存储系统，它仅仅提供了用于更加了解kububernetes卷插件原理的一个实验环境而已；
+	
+	启动并进入以下pod，然后我们就有使用rook命令来管理存储集群的基础环境：
 	创建client Pod： rook-client.yaml
 apiVersion: v1
 kind: Pod
@@ -137,12 +141,14 @@ spec:
       - name: libmodules
         hostPath:
           path: /lib/modules
+
 运行client pod：
 	kubectl create -f rook-client.yml
 
-等到pod处于运行状态，然后连接该pod：
+等到pod处于运行状态，然后进入pod：
 	kubectl exec -it rook-client bash 
-该工具将自动获取连接管理API的配置以及我们管理Rook集群的配置；
+
+该工具将自动载入管理API的配置以及管理Rook集群的配置；
 	查看集群中的节点信息：
 		rook node ls
 	查看集群状态：
@@ -150,46 +156,48 @@ spec:
 	创建s3存储：
 		rook object create
 	查看所有的使用方法，可以查看readme【https://github.com/rook/rook/blob/master/demo/client/README.md】	
-或者询问help：
+或者使用help：
 	rook --help
 
 Kubernetes资源规划：
-	该【操作】通过创建若干kubernetes原生资源来自动完成初始化集群，然后监控资源来保证集群的健康；
+	该存储通过创建若干kubernetes原生资源来自动完成集群初始化，然后监控资源以保证集群的健康状态；
 密钥：
 	集群首次运行，ceph admin【这里为什么是ceph admin呢，因为rook cluster仅仅是ceph cluster的封装而已】
 和monitor密钥将自动生成并保存在kubernetes 密钥对中；
 
 服务：
 	三个ceph monitor运行以Pods形式集群中运行；这些pods对保证存储集群的健康是至关重要的；
-	在集群中至少有三个节点，并且反亲和性默认被指定的；所以故障域必须是跨节点的；
+	在集群中至少有三个节点，由于反亲和性在默认情况下是被指定的；所以故障域必须是跨节点的；
 
 	在pods运行之后，集群将在通知ceph osd之前等待ceph monitor选举确定；
 	集群将启用一个go 协程来监控monitor pods的健康状态；
 
-服务集：
-	ceph osd都将标上deamon set；因为osd pod运行在各个机器上，存储配置将存储为空目录形式；
+服务集合：
+	在标明为存储节点的机器中一对damon set将为ceph osd而运行；
+	因为osd pod运行在各个机器上，存储配置将存储为空目录形式；
 	默认情况下，数据将存放在该目录下，在未来，我们将赋予存储集群管理员指定节点上使用设备或目录来进行存储
 	的能力；
 
-	pod将监控本地osd的健康状态；
+	pod将监控本地osd的运行状态；
 
 第三方资源：
-	假如集群管理员需要更改集群的配置，Rook提供了TPR的方式来指明存储集群该如何配置；集群将监控TPR以及应用
-该修改在集群中，在未来，TPR将拥有兼容s3/swift的ceph RGW，分布式文件系统（mds），管理ceph用户（这些用户均用
-来连接rbd卷）等等功能；
+	如果管理员需要更改集群的配置，Rook提供了TPR（third party resources ）的方式来指导该如何配置；集群将监控TPR（third party resources ）以及应用
+该修改在集群中，将来，TPR将拥有兼容s3/swift的ceph RGW，分布式文件系统（mds），管理ceph用户（这些用户可以
+使用rbd卷）等等功能；
 
 管理api：
-	RooK api deployment用以提供restful形式的管理平台以及简化集群周边的管理任务，API提供了查看集群健康状态以及
+	RooK api deployment用以提供restful形式的管理平台以及简化集群周边的管理任务，API则提供了查看集群健康状态以及
 	更新集群配置的功能，最典型的API示例就是rook client tool
 
 可靠性：
-	假如【operator】由于某些原因停止运行，存储集群依然会像预期那样继续运行，ceph mon，osd，mds和rgw服务	
-与operator毫无关联，最基础的集群监控是通过k8s自身来运行的，如果operator再次运行，更加完善的健康系统将会恢复；
-并且维护第三方资源的健康状态，；这些情况将为完美应用；
+	假如Rook存储由于某些原因停止运行，存储集群依然会像预期那样继续运行，ceph mon，osd，mds和rgw服务	
+与Rook存储没有耦合，最基础的集群监控是通过k8s自身来运行的，如果Rook存储再次运行，更加完善的健康检测系统将会恢复；
+并且维护第三方资源的健康状态；
 
 周边：
-	rook operator的目标是使用集群来完成自动存储，维持集群的可靠性，维护数据的安全性；operator仅仅运行在当前目录下，
+	Rook存储的目标是使用集群来完成自动存储，维持集群的可靠性，维护数据的安全性；Rook存储现阶段仍旧处于起步阶段；
 	我们期待您的反馈以及为将来的版本做出贡献；
 查看更多文档以及简单yaml文件，查看rook githup【https://github.com/rook/rook/tree/master/demo/kubernetes】
+
 
 http://blog.csdn.net/zqz_qizheng/article/details/56346249
