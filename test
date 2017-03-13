@@ -1,4 +1,4 @@
-
+乐都西路，867号
 Rook存储：kubernetes中最优秀的存储
 	在kubernetes v0.3正式版中，Rook将原生态的云存储系统以kubernetes application方式与kubernetes结合；
 块存储，对象存储，分布式文件系统已经直接与kuberenete application进行了融合；
