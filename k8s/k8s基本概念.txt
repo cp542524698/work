@@ -1,0 +1,339 @@
+机器：
+		222.73.196.34，
+		103.211.44.24:8022  docker机器，杨浦idc；
+		192.168.150.35  松江测试；
+k8s集群：
+	103.211.44.30 6022
+	103.211.44.31 6022
+
+请在主机上安装agent:
+	1、下载软件包：https://zabbix.ztgame.com.cn/agent/zabbix_agent.tar.gz
+	2、解压,进入目录，运行deploy_agent.py
+INSERT INTO relationship(instanceid, address) SELECT "test", "127.0.0.1" FROM DUAL WHERE NOT EXISTS(SELECT instanceid, address FROM relationship where instanceid="test", address="127.0.0.1")
+
+alias kubectl=" kubectl -s http://apiserver:8080"
+alias kubectl='kubectl --kubeconfig=/etc/kubernetes/kubelet.conf'
+
+#godoc 包名， 函数
+godoc io Reader
+
+services：k8s的基本操作单元，是真实应用服务的抽象，每一个服务后面都对应一组容器来支持，通过proxy的port和服务selector决定服务请求传递给后端提供
+	提供服务的容器，对外表现为一个单一的访问接口，外部不需要了解后端如何运行，这给扩展性带来很大的好处。
+
+replication controller：确保k8s集群中指定数量的pod副本（replicas）在运行，“多退少补”
+	rc的用法：
+		1、reschudeling: 维护pod副本，“多退少补”；即使是某些minion宕机
+		2、scaling：通过修改rc的副本数来水平扩展或者缩小运行的pods
+		3、Rolling updates:一个一个地替换pods来rolling updates服务；
+		4、multiple release tracks：如果需要在系统中运行multiple release 服务，replication controller使用labels来区分multiple release tracks；
+Labels：
+	用来区分Pod、Service、rc的kv键值对，kv是一一对应的，Labels是Service 和Replication Controller运行的基础，
+	为了将访问Service的请求转发给后端提供的多个容器，正是通过标识容器的labels来选择目标容器的，同样、rc也是用labels来管理通过pod模板创建的
+	一组容器，这样rc可以方便管理多个容器；
+
+k8s采用扁平化的网络模型，要求每个pod拥有一个全局唯一的ip，pod直接可以跨主机通信，目前成熟的方案是flannel，
+	flannel的工作模式：
+		1、UDP\VXLAN\Host-gw\Aws-vpc
+
+使用docker时，container的数据都是临时的，即当container销毁时，其中的数据将丢失，如果需要持久化数据，需要使用Docker Volume挂在宿主机上
+文件目录到容器中。
+	kubernetes中的volume则是基于Docker进行扩展，支持更加丰富的功能；
+以mysql为例：
+	数据库为了能够持久化数据，而不是每次容器挂了数据就没有了，需要挂载一个数据目录到容器中。但是k8s是分布式的，为了解决这个问题就需要
+分布式文件系统，来使得k8s的每个kubelet都能访问到该数据目录，k8s中为了解决这个问题，有两个抽象，叫做：persist volume 和persist volume claim
+
+Label : 一个label是一个被附加到资源上的键/值对，譬如附加到一个Pod上，为它传递一个用户自定的并且可识别的属性.Label还可以被应用来组织和选择子网中的资源
+selector是一个通过匹配labels来定义资源之间关系得表达式，例如为一个负载均衡的service指定所目标Pod.
+Replication Controller : replication controller 是为了保证一定数量被指定的Pod的复制品在任何时间都能正常工作.
+它不仅允许复制的系统易于扩展，还会处理当pod在机器在重启或发生故障的时候再次创建一个
+Service : 一个service定义了访问pod的方式，就像单个固定的IP地址和与其相对应的DNS名之间的关系。
+Volume: 一个volume是一个目录，可能会被容器作为未见系统的一部分来访问。Kubernetes volume 构建在Docker Volumes之上,并且支持添加和配置volume目录或者其他存储设备。
+Secret : Secret 存储了敏感数据，例如能允许容器接收请求的权限令牌。
+Namespace : Namespace 好比一个资源名字的前缀。它帮助不同的项目、团队或是客户可以共享cluster,例如防止相互独立的团队间出现命名冲突
+Annotation : 相对于label来说可以容纳更大的键值对，它对我们来说可能是不可读的数据，只是为了存储不可识别的辅助数据，尤其是一些被工具或系统扩展用来操作的数据
+
+Service：【为pod提供服务，是以pod为单位的】
+一个service是一组提供相同服务的Pod的对外访问接口。Service是个虚拟的东西，他依靠Pod为其提供支持，一个service需要一组提供相同服务的Pod。Service通过label标签来确定选择
+哪些Pod作为他的支持。
+Service有两种：集群内service和对外暴露service。
+		集群内service会在kubernetes的cluster IP Range池中分配一个IP地址（查上面--service-cluster-ip-range这个参数看一下），
+			这个ip地址在集群内的Pod都可以访问，但是对外不可见。每次启动一个service时，kubernetes都在这个ip-range里面随机的为service分配ip地址。
+		对外保留的Service需要明确 type:NodePort，这样系统就会在Node上面打开一个主机上的真实端口，客户就能够在集群外访问这个service 了。
+k8s中service主要有三种：
+	1、clusterIP：主要用于是方便pod到pod之间的调用，在每个node使用iptables，将发向clusterIP对应端口的数据，转发到kube-proxy中；
+		然后kube-proxy内部实现负载均衡的方法，并可以查询到这个service下对应的pod的地址和端口，进而把数据转发给对应的pod的地址和端口；
+	2、nodePort/LoadBalancer
+		nodePort原理在于在node上开了一个端口，将向该端口的流量导入到kube-proxy,然后有kube-proxy进一步到给对应的pod
+
+容器跨host迁移工具：CRIU
+CRIU – Checkpoint/Restore In Userspace
+` 用途：
+` 将进程状态保存为文件
+` 通过文件恢复进程
+
+
+
+apiversion: v1
+kind: Pod 
+metadata:
+	name: hello-world  #pod  资源名称，集群内唯一
+spec:
+
+
+ docker01： volumes/volume-2d5c5e91-3fd2-448d-bf6e-166423bf2b1d
+ docker02： volumes/volume-54391f7d-a62a-430b-9c17-28f65a4ad57c
+ docker03： volumes/volume-b4181dfe-d967-4a55-ab57-5115934d9bbe
+
+docker-compose安装配置：curl -L https://github.com/docker/compose/releases/download/1.9.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+yum -y install epel-release  #centos扩展包安装
+
+#include <stdio.h>
+#define NDEBUG
+#include <assert.h>
+
+void assert(int experssion);
+
+
+ceph中国社区微信公众号推广：
+	仅针对于服务器相关基础设施产品以及云厂商产品进行有偿推广
+	1、推广方提供基于ceph相关的测试材料以及其同类产品对比的数据；价钱:公众号人数*1.5/次
+	2、需要ceph中国社区为其推广提供测试数据材料；                价钱:公众号人数*2.5/次
+	3、拒绝推广脱离ceph相关的产品
+
+企业推广可提供发票（淘宝购）
+----180.168.126.246
+
+
+INSERT INTO T3(`computer`,` installation_time`, `ip`, `pro`, `city`, `oss`, `ver`) select `计算机名称`, `安装时间` ,`IP地址`, `省份`
+`县市`,`操作系统版本`,`安装时的版本号` from T2 not in ( select `computer`,` installation_time`, `ip`, `pro`, `city`, `oss`, `ver` from T2)
+
+堡垒机下载：
+NanHui-F3-Cloud30 下目录/opt/www/media/XXX.jpg
+下载：http://m.scloudm.com/media/XXX.jpg
+
+#ceph daemon 编译之后瘦身
+strip --strip-debug --strip-unneeded   src/ceph-osd 
+
+OPENSTACK ICEHOUSE 迁移虚拟机
+
+一个场景：由于虚拟机占用了2.9TB的磁盘空间，又不是共享存储，又不能停机超过2个小时，但是需要迁移这个虚拟机。最后采用了RSYNC 同步DISK这个文件即可。这个方法解决了我的问题。
+
+另一个场景：
+测试环境中，我只有2个节点A计算节点和B计算节点，A节点资源严重超标开了很多虚拟机，这个时候想把B节点的虚拟机迁移到A节点上。因为A节点已经满了。这个时候用OPENSTACK的冷迁移 或者热迁移，都会报各种错误，大致提示内存或者CPU 或者DISK 不够，无法完成迁移。看了一圈代码，发觉要改的地方很多，怕影响以后的功能，于是来一个冷迁移。
+
+方法：
+nova list
+先找出哪些虚拟机是B节点的。
+
+到B计算节点 cd /var/lib/nova/instance/
+
+scp -rp c7f24ad4-9d33-4b43-941a-8fb9976c66e8 root@A节点:/var/lib/nova/instance/
+
+然后修改MYSQL
+use nova;
+update instances set host=’A’ where hostname=’vm_1′;
+
+启动实例 OK了
+
+OpenStack有两种在线迁移类型：live migration和block migration。Live migration需要实例保存在共享存储中，否则会报错，这种迁移主要是实例的内存状态的迁移，速度应该会很快。Block migration除了实例内存状态要迁移外，还得迁移磁盘文件，速度会慢些，但是它不要求实例存储在共享文件系统中。这里我所进行的是block migration。这两种迁移方式在nova client都通过命令nova live-migration实现。带参数–block_migrate表示后一种，不带表示前一种。要进行该操作需要用户在实例所在的tenant有admin角色。
+
+nova live-migration --block-migrate  a37b239c-3c91-4eb3-95af-3b95d45091e1 compute2
+
+请教各位在已给k8s部署了内部kube-dns后还能给容器加私有DNS吗？
+
+k8s网络模型：
+	k8s从Docker网络模型(NAT方式的网络模型)中独立出来形成一套新的网络模型。该网络模型的目标是：
+		每一个Pod都拥有一个扁平化共享网络命名空间的IP，称为PodIP，通过PodIP， Pod能够跨网络与其他物理机和Pod进行通信。一个Pod 一个IP的
+	(IP-Per-Pod) 模型创建了一个干净、反向兼容的模型。
+	在该模型中，从端口分配，网络，域名解析，服务发现，负载均衡，应用配置和迁移等角度，Pod都能够被看成虚拟机或物理机，这样应用就能够平滑地
+	从非容器环境(物理机或虚拟机)迁移到同一个Pod的容器环境。
+		为了实现这个网络模型，在k8s中需要解决几个问题：
+
+
+客服热线 54594545-8752 陈家宗（电话咨询时间：工作日上午9:00-下午17:00，每周四除外）
+咨询邮箱 giant@ciicsh.com
+
+
+
+RC ---- 副本控制器 Replication Controller RC
+RS ---- 副本集
+Service  
+Deployment
+Job
+DaemonSet 
+PetSet --- 有状态
+
+服务发现 与 负载均衡：
+	负载均衡机制：
+		Service： 直接使用Service 提供cluster 内部的负载均衡，并借助cloud provider 提供的LB提供外部访问；
+		Ingress Controller： 还是用Service 提供cluster内部的负载均衡，并借助cloud provider提供的自定义LB提供外部访问；
+		Service LoadBalancer: 
+		Custom Load Balancer:
+
+
+neutron:
+neutron ext-list		#
+查看neutron agent：
+    #neutron agent-list
+
+创建flat模式的public网络，注意这个public是外出网络，必须是flat模式的
+#neutron --debug net-create --shared provider  --router.external True --provider:network_type flat --provider:physical_network provider
+
+执行完这步，在界面里进行操作，把public网络设置为共享和外部网络
+
+
+docker inspect --format "{{ .State.Pid }}" <container-id>
+
+
+
+nsenter --target $PID --mount --uts --ipc --net --pid
+
+
+docker run --name zabbix-agent -p 10050:10050 -v /proc:/data/proc -v /sys:/data/sys -v /dev:/data/dev -v /var/run/docker.sock:/var/run/docker.sock -e ZABBIX_SERVER=*.*.*.* -e HOSTNAME=showcase --restart=always -d million12/zabbix-agent:latest
+
+
+ceilometer主要概念：
+	Meter: 计量项
+	Sample： 某Resource 某时刻某 Meter 的值	
+	Statistics：某区间 Samples 的聚合值
+	Alarm：某区间 Statistics 满足给定条件后发出的告警	
+
+
+resourece表： 
+	每个主机的监控类型：
+	剩余内存， （总内存应该有，可能配置有问题； 实在不行可以通过openstack命令获取）
+	磁盘读写iops
+	cpu性能数据；
+
+
+
+测试机器：（172集群， instance-id：679f0625-62c4-434e-b108-778d3c63aa22）
+	select * from resource where resource_id like "%679f0625-62c4-434e-b108-778d3c63aa22%"\G;
+
+select volume, FROM_UNIXTIME(timestamp, '%Y-%m-%d %H:%i:%S') from sample where meter_id=23 and (resource_id=13 or resource_id=14 or resource_id=16 or resource_id=20 or  resource_id=22  or resource_id=26);
+
+
+
+/usr/lib/python2.7/site-packages/ceilometer-2015.1.1-py2.7.egg-info/entry_points.txt 
+
+{
+    "jsonrpc": "2.0",
+    "method": "usergroup.create",
+    "params": {
+        "name": "Operation managers",
+        "rights": {
+            "permission": 0,
+            "id": "2"
+        },
+        "userids": "12"
+    },
+    "auth": "038e1d7b1735c6a5436ee9eae095879e",
+    "id": 1
+}
+
+测试密码：ZtGame@321EWQdsa
+ZtGame@321EWQdsa
+
+
+1、redhat7/centos7系列默认防火墙使用firewalld,关闭之
+	systemctl stop firewalld.service 
+2、安装iptables
+	yum install -y iptables-services
+3、systemctl start   iptables.service
+   systemctl enable  iptables.service
+
+	/etc/sysconfig/iptables #编辑防火墙配置文件
+
+4、查看规则：
+	iptables -nL	//注意，该输出的顺序很重要
+	对filter表(iptables默认表)的INPUT链配置：
+		//所有input都丢弃；然后开放22端口
+		iptables -A INPUT -j DROP ; iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+	
+	对filter表(iptables默认表)的FORWARD链配置：
+		iptables -A FORWARD -j DROP
+	对filter表(iptables默认表)的OUTPUT链配置：	
+		iptables -A OUTPUT  -j ACCEPT
+
+	放开lo：
+		iptables -A INPUT -p all -j ACCEPT
+
+
+要求能够属性在虚拟机里安装openstack环境，并熟悉trouble shooting；
+环境：windows vmware, 三节点安装计算、控制、和cinder volume[lvm形式]
+网络：linux bridge + vxlan
+
+centos7
+关闭防火墙：
+	# systemctl stop firewalld.service   #停止firewall
+	# systemctl disable firewalld.service #禁止firewall开机启动
+关闭selinux：
+	#sestatus 	#查看selinux状态
+	#setenforce 0 #临时关闭selinux
+	#永久关闭,可以修改配置文件/etc/selinux/config,将其中SELINUX设置为disabled
+
+	iptables -A INPUT -j ACCEPT
+	对filter表(iptables默认表)的FORWARD链配置：
+		iptables -A FORWARD -j 
+	对filter表(iptables默认表)的OUTPUT链配置：	
+		iptables -A OUTPUT  -j ACCEPT
+
+systemctl  stop firewalld
+systemctl  disable firewalld
+yum  install  iptables-services -y
+安装docker1.12版本：
+	#https://yum.dockerproject.org/repo/main/centos/7/Packages/
+	yum install docker-engine-1.12.6
+
+
+/cgi-bin/gettoken?corpid=ww6620ee407381518f&corpsecret=cZvePiX7YVax36v2wDFkgrNR453FGyMsHmYVKcoeu4M
+
+ 20 type User struct {        
+ 21     Email      string `json:"email"`
+ 22     Tel        string `json:"tel"` 
+ 23     Wechat     string `json:"wechat"`
+ 24     Tenantid   string `json:"tenantid"`
+ 25     Tenantname string `json:"tenantname"`
+ 26 } 
+
+
+kind: service
+apiVersion: v1
+metadata:
+	name: my-service
+
+spec:
+	selector:
+		app: MyApp
+	ports:
+		- protocol: TCP
+		  port: 80
+		  targetPort: 9376
+创建一个名称为“my-service”的service对象，它将请求代理到使用TCP端口9376，
+并且具有标签“app=MyApp”的pod上；这个Service将被指派一个IP地址（通常称为“Cluster IP”）
+它会被服务的代理使用。
+
+shenzhiwei@opstack.cc  sil0rY0kkA0nZXE0
+
+
+kubernetes认证：
+	1、基本认证：
+		--basic-auth-file = /path/to/basic-auth.csv
+	2、Token认证：
+		--token-auth-file = /path/to/token-auth.csv
+	3、CA认证：
+		在使用证书认证之前首先需要申请证书，证书可以通过权威CA来申请，也可以通过自签证书，不过部署kubernetes的大多数环境都是内网环境，所以更多的还是使用的是自签证书。
+
+[root@node0 heapster]# kubectl create -f .
+deployment "monitoring-grafana" created
+service "monitoring-grafana" created
+deployment "heapster" created
+serviceaccount "heapster" created
+clusterrolebinding "heapster" created
+service "heapster" created
+configmap "influxdb-config" created
+deployment "monitoring-influxdb" created
+service "monitoring-influxdb" created
+
+
+

@@ -1,0 +1,310 @@
+测试机器：
+222.73.155.(059+1) 简短6位密码
+
+获取X-Auth-Token（token id)值，然后使用这个认证的值调用相关的api接口。如下过程：
+curl -k -X POST -v http://0.0.0.0:5000/v2.0/tokens -d '{"auth":{"passwordCredentials":{"username":"admin", "password"
+:"be5e5bf0ce0b542fe"}}}'  -H "Content-type:application/json"   |python -mjson.tool
+{ [显示结果省略curl -v部分]
+    "access": {
+        "metadata": {
+            "is_admin": 0,
+            "roles": []
+        },
+        "serviceCatalog": [],
+        "token": {
+            "audit_ids": [
+                "KJ0HavaoRXuzR2zJrGSr9g"
+            ],
+            "expires": "2016-04-30T08:03:12Z",
+            "id": "c0961e84a60646948608750f3b240aea",
+            "issued_at": "2016-04-29T08:03:12.875249"
+        },
+        "user": {
+            "id": "07c1d92374a54135b949a2461891e274",
+            "name": "admin",
+            "roles": [],
+            "roles_links": [],
+            "username": "admin"
+        }
+    }
+}
+利用为认证的token调用api：
+curl -X 'GET' -H "X-Auth-Token:c0961e84a60646948608750f3b240aea" -v http://0.0.0.0:5000/v2.0/tenants |python -mjson.tool
+{
+    "tenants": [
+        {
+            "description": "",
+            "enabled": true,
+            "id": "53ed00f9d3da45108a730591660eb6f7",
+            "name": "liujiahua-test"
+        },
+        {
+            "description": "",
+            "enabled": true,
+            "id": "92eb6d23a66346429271ccfb3064eb69",
+            "name": "10126-huzhimeng"
+        },
+        {
+            "description": "admin tenant",
+            "enabled": true,
+            "id": "d40f594067e548148084be98dd48f9ed",
+            "name": "admin"
+        }
+    ],
+    "tenants_links": []
+}
+
+当你按照api-doc接着调用compute、image、volume等下面的api接口时，会发现统统没有返回值，经过一段时间的摸索，发现对下剩下的api接口
+是需要使用认证过的token才能使用的；
+再次获取认证过的token：
+curl -X POST -d '{"auth": {"tenantName:":"admin", "passwordCredentials":{"username":"admin", "password":"be5e5bf0ce0b542fe"}}}' 
+-H "Content-type:application/json" http://0.0.0.0:35357/v2.0/tokens |python -mjson.tool
+{
+    "access": {
+        "metadata": {
+            "is_admin": 0,
+            "roles": []
+        },
+        "serviceCatalog": [],
+        "token": {
+            "audit_ids": [
+                "SrRPK2sFT4unQlDClyb58Q"
+            ],
+            "expires": "2016-04-30T08:11:18Z",
+            "id": "75fbb24cbbcf474dadd421f624ae170e",
+            "issued_at": "2016-04-29T08:11:18.293830"
+        },
+        "user": {
+            "id": "07c1d92374a54135b949a2461891e274",
+            "name": "admin",
+            "roles": [],
+            "roles_links": [],
+            "username": "admin"
+        }
+    }
+}
+{
+    "access": {
+        "metadata": {
+            "is_admin": 0,
+            "roles": [
+                "9080b0f159ba4794b9b350d80654dbf0"
+            ]
+        },
+        "serviceCatalog": [
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed",
+                        "id": "42e884a1a1184282a8d473400e226ec4",
+                        "internalURL": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed",
+                        "publicURL": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "nova",
+                "type": "compute"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:9696",
+                        "id": "2ba5484cb35442a2936b7bc295497c11",
+                        "internalURL": "http://192.168.39.115:9696",
+                        "publicURL": "http://192.168.39.115:9696",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "neutron",
+                "type": "network"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:8776/v2/d40f594067e548148084be98dd48f9ed",
+                        "id": "54b3a94439cc46258bc52f9493b0320e",
+                        "internalURL": "http://192.168.39.115:8776/v2/d40f594067e548148084be98dd48f9ed",
+                        "publicURL": "http://192.168.39.115:8776/v2/d40f594067e548148084be98dd48f9ed",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "cinderv2",
+                "type": "volumev2"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://127.0.0.1:8774/v3",
+                        "id": "81eb060e4dc84a78974008f417f8cc51",
+                        "internalURL": "http://127.0.0.1:8774/v3",
+                        "publicURL": "http://127.0.0.1:8774/v3",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "novav3",
+                "type": "computev3"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:9292",
+                        "id": "b27ea3b52c7043678e838c6f872079ac",
+                        "internalURL": "http://192.168.39.115:9292",
+                        "publicURL": "http://192.168.39.115:9292",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "glance",
+                "type": "image"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:8777",
+                        "id": "09e581d63c5041059cc7f1a26d1b66ec",
+                        "internalURL": "http://192.168.39.115:8777",
+                        "publicURL": "http://192.168.39.115:8777",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "ceilometer",
+                "type": "metering"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:8776/v1/d40f594067e548148084be98dd48f9ed",
+                        "id": "3834775da4ca42f1bea73323cfe4afed",
+                        "internalURL": "http://192.168.39.115:8776/v1/d40f594067e548148084be98dd48f9ed",
+                        "publicURL": "http://192.168.39.115:8776/v1/d40f594067e548148084be98dd48f9ed",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "cinder",
+                "type": "volume"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:8773/services/Admin",
+                        "id": "47134e6362cd44099a5d04d2a53a1e2e",
+                        "internalURL": "http://192.168.39.115:8773/services/Cloud",
+                        "publicURL": "http://192.168.39.115:8773/services/Cloud",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "nova_ec2",
+                "type": "ec2"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://192.168.39.115:35357/v2.0",
+                        "id": "78d15034abf6454c8331f4ec569a6959",
+                        "internalURL": "http://192.168.39.115:5000/v2.0",
+                        "publicURL": "http://192.168.39.115:5000/v2.0",
+                        "region": "kilo"
+                    }
+                ],
+                "endpoints_links": [],
+                "name": "keystone",
+                "type": "identity"
+            }
+        ],
+        "token": {
+            "audit_ids": [
+                "4xD45zZQSXOhdqhkByXx8A"
+            ],
+            "expires": "2016-04-30T08:15:22Z",
+            "id": "0cfd992bf15b4153a6fca339154a7304",
+            "issued_at": "2016-04-29T08:15:22.063712",
+            "tenant": {
+                "description": "admin tenant",
+                "enabled": true,
+                "id": "d40f594067e548148084be98dd48f9ed",
+                "name": "admin"
+            }
+        },
+        "user": {
+            "id": "07c1d92374a54135b949a2461891e274",
+            "name": "admin",
+            "roles": [
+                {
+                    "name": "admin"
+                }
+            ],
+            "roles_links": [],
+            "username": "admin"
+        }
+    }
+}
+使用返回的token id和tenant id调用api返回该tenant下的servers
+ curl -X GET -H "X-Auth-Token:0cfd992bf15b4153a6fca339154a7304"  -H "Content-type:application/json" 
+ http://0.0.0.0:8774/v2/d40f594067e548148084be98dd48f9ed/servers |python -mjson.tool
+ {
+    "servers": [
+        {
+            "id": "0a1d31f3-e4e8-4f85-b5a2-1c2da295b476",
+            "links": [
+                {
+                    "href": "http://0.0.0.0:8774/v2/d40f594067e548148084be98dd48f9ed/servers/0a1d31f3-e4e8-4f85-b5a2-1c2da295b476",
+                    "rel": "self"
+                },
+                {
+                    "href": "http://0.0.0.0:8774/d40f594067e548148084be98dd48f9ed/servers/0a1d31f3-e4e8-4f85-b5a2-1c2da295b476",
+                    "rel": "bookmark"
+                }
+            ],
+            "name": "hoo"
+        },
+        {
+            "id": "f40fcb37-ea2a-40c0-a08e-bee8b9b68ebe",
+            "links": [
+                {
+                    "href": "http://0.0.0.0:8774/v2/d40f594067e548148084be98dd48f9ed/servers/f40fcb37-ea2a-40c0-a08e-bee8b9b68ebe",
+                    "rel": "self"
+                },
+                {
+                    "href": "http://0.0.0.0:8774/d40f594067e548148084be98dd48f9ed/servers/f40fcb37-ea2a-40c0-a08e-bee8b9b68ebe",
+                    "rel": "bookmark"
+                }
+            ],
+            "name": "test"
+        }
+    ]
+}
+通过返回值可以看到vm tenant中共包含hoo、test 两个实例。
+ curl -g -X GET http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9 
+ -H "content-type: application/json" -H "X-Auth-Token: 2d8f7f05530349abac4ee6b0cb9022bf" |python -mjson.tool
+ {
+    "flavor": {
+        "OS-FLV-DISABLED:disabled": false,
+        "OS-FLV-EXT-DATA:ephemeral": 0,
+        "disk": 50,
+        "id": "0867a43b-3c58-4246-99ce-b316045563d9",
+        "links": [
+            {
+                "href": "http://192.168.39.115:8774/v2/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9",
+                "rel": "self"
+            },
+            {
+                "href": "http://192.168.39.115:8774/d40f594067e548148084be98dd48f9ed/flavors/0867a43b-3c58-4246-99ce-b316045563d9",
+                "rel": "bookmark"
+            }
+        ],
+        "name": "cpu_2_mem_2G_disk_50G_sys",
+        "os-flavor-access:is_public": true,
+        "ram": 2048,
+        "rxtx_factor": 1.0,
+        "swap": "",
+        "vcpus": 2
+    }
+}

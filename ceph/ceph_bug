@@ -1,0 +1,28 @@
+  952  root 2016-07-13 11:14:23 : ceph pg repair  1.399
+  965  root 2016-07-14 09:54:17 : ceph pg repair  1.107
+  966  root 2016-07-14 09:54:23 : ceph pg repair 1.234
+  967  root 2016-07-14 09:54:28 : ceph pg repair 1.17f
+  995  root 2016-07-14 22:45:42 : ceph pg repair 1.148
+  996  root 2016-07-14 22:45:50 : ceph pg repair 1.16
+  997  root 2016-07-14 22:45:58 : ceph pg repair 1.33b 
+ 1001  root 2016-07-14 22:52:17 : ceph pg repair 1.33b
+ 1004  root 2016-07-14 22:54:13 : ceph pg repair 1.33b 
+ 1007  root 2016-07-14 22:58:07 : ceph pg repair  1.341 
+ 1010  root 2016-07-15 06:16:44 : ceph pg repair 1.12d
+ 1011  root 2016-07-15 06:16:57 : ceph pg repair 1.23
+ 1012  root 2016-07-15 06:17:04 : ceph pg repair 1.3c2
+ 1013  root 2016-07-15 06:17:12 : ceph pg repair 1.3b4
+ 1014  root 2016-07-15 06:17:22 : ceph pg repair 1.2b2
+ 1015  root 2016-07-15 06:17:31 : ceph pg repair  1.24c
+ 1016  root 2016-07-15 06:17:40 : ceph pg repair  1.191
+ 1017  root 2016-07-15 06:17:48 : ceph pg repair  1.186 
+ 1020  root 2016-07-15 06:21:27 : ceph pg repair 1.23
+ 1021  root 2016-07-15 06:21:37 : ceph pg repair 1.3c2
+ 1022  root 2016-07-15 06:21:48 : ceph pg repair  1.2b2
+ 1023  root 2016-07-15 06:22:01 : ceph pg repair  1.24c
+
+
+[root@SJ-6-Cloud121 ~]# ceph health detail
+HEALTH_ERR 1 pgs inconsistent; 1 scrub errors
+pg 1.2b2 is active+clean+inconsistent, acting [19,34,84]
+1 scrub errors

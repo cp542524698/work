@@ -1,0 +1,486 @@
+Help and Manual6 破解码：
+    sn:HM6-CQNL3H-5QAZ-CXM4P7
+    AC:AC2330
+
+
+ceph卡在active+remapped状态：
+执行：ceph osd crush reweight XX即可ok
+
+#查看map了test.img的节点：
+rados -p images listwatchers test.img
+# ceph pg 1.619 query  #查看pg状态
+#ceph pg set_nearfull_ratio 0.9  #待验证
+
+
+ceph的log没有具体的文件行号，我自己加的代码
+
+#define dout_subsys ceph_subsys_rgw
+#define INFO     dout(1) <<__FILE__<<":"<<__func__<<":"<<__LINE__<<":"<<
+这样log中就有具体的函数和文件行号了
+
+ceph提供有自动调节reweight的工具：ceph osd reweight-by-utilization
+ceph osd crush tunables optimal //最优化crush，暂不知道优化了之后的修改地方在哪
+
+osd目录以及名字解析：
+	数据目录/PG名称/子目录/object文件名
+	举例说明：
+	/data09/ceph/osd2/current/0.0_head/DIR_0/DIR_8/DIR_9/10000007af4.00000000__head_3AF0B980__0
+	其中，子目录是根据object文件名中hash字段的字符反向排列生成。当一个目录中的文件个数大于配置值（merge_threshold * 16 * split_multiplier）时，会建子目录，对文件进行归档。
+
+
+pgp_num决定了多少pg会拿来存放数据，也就是说并不是所有创建出来的pg都会存放数据；
+调整pg的数目会触发相关pg的分裂操作（但不会数据迁移，因为分裂后的pg会map到其父pg对应的osd集合），调整pgp_num会导致集群内发生数据迁移；
+
+降低fillback的最大数和recovery的最大数
+
+ceph --admin-daemon /var/run/ceph/ceph-mon.SJ-6-Cloud101.asok  help
+ceph --admin-daemon /var/run/ceph/ceph-osd.22.asok  help
+/usr/bin/radosgw -d --debug-rgw 20 --debug-ms 1 start
+ceph tell osd.* injectargs "--rbd_cache true" 		# * 批量修改
+ceph tell osd.* injectargs "--debug-osd 20"
+#osd.X reported failed by osd.XX
+ceph daemon /var/run/ceph/ceph-mon.ceph.asok config set osd_heartbeat_grace 60
+
+如何限制 ceph rbd 的qos和读写速度呢
+可以在client配置objecter inflight *，参数
+
+--image-format format-id
+选择用哪个对象布局，默认为 1 。
+format 1 - 新建 rbd 映像时使用最初的格式。此格式兼容所有版本的 librbd 和内核模块，但是不支持较新的功能，像克隆。
+format 2 - 使用第二版 rbd 格式， librbd 和 3.11 
+版以上内核模块才支持（除非是分拆的模块）。此格式增加了克隆支持，使得扩展更容易，还允许以后增加新功能。
+
+为使用rbd 块新特性，使用格式2，在map 时发生以上报错：
+    查找官网相关资料，找到信息如下：
+笔者安装的是jewel 版本，新建rbd块指定格式2，默认格式2的rbd 块支持如下特性，默认全部开启；
+layering: 支持分层
+striping: 支持条带化 v2
+exclusive-lock: 支持独占锁
+object-map: 支持对象映射（依赖 exclusive-lock ）
+fast-diff: 快速计算差异（依赖 object-map ）
+deep-flatten: 支持快照扁平化操作
+journaling: 支持记录 IO 操作（依赖独占锁）
+
+使用系统为centos7.2 ，内核版本 3.10.0-327.18.2.el7.x86_64,根据报错内容提示可知，服务器系统内核版本，不支持有些格式2 
+的新特性导致。可以使用 
+--image-feature   选项指定使用特性，不用全部开启。我们的需求仅需要使用快照等特性，开启layering即可，配置方式如下：
+rbd create rbd/test1 --size 10G --image-format 2 --image-feature  layering
+rbd ls
+rbd map rbd/test1   #可以正常映射；
+ 
+#经测试，内核版本 3.10，仅支持此特性（layering），其它特性需要使用更高版本内核，或者从新编译内核加载特性模块才行。
+ceph daemon  osd.0 config show |less  -----------查看ceph集群参数设置；
+
+ec Pool：
+osd_pool_erasure_code_stripe_width = 4194304
+ceph tier测试
+    新建2个pools：
+        ceph osd pool create cachepool  128 128
+        ceph osd pool create datapool 1024 1024
+    关联两个pool：
+        ceph osd tier add  datapool cachepool
+    设置cache模式：
+        ceph osd tier cache-mode cachepool writeback
+    设置over-lay：【所谓overlay，即所有发送到后端存储层的请求会被转发到cache层】
+        ceph osd tier set-overlay datapool cachepool
+    配置cache tier：
+        ceph osd pool set cachepool hit_set_type bloom
+        ceph osd pool set cachepool hit_set_count 1
+        ceph osd pool set cachepool hit_set_period 3600
+        ceph osd pool set cachepool target_max_bytes 1000000000000
+        ceph osd pool set cachepool min_read_recency_for_promote 1
+
+        ceph osd pool set tierpool target_max_bytes   XX
+        ceph osd pool set tierpool target_max_objects XX
+
+max_objects和max_bytes
+ceph osd pool  set tierpool max_objects  XX   				*******
+ceph osd pool  set tierpool max_bytes    xx                 *******
+ceph osd pool set tierpool hit_set_type bloom
+ceph osd pool set tierpool cache_target_dirty_ratio 0.4
+ceph osd pool set tierpool cache_target_full_ratio 0.8
+ceph osd pool set tierpool cache_min_evict_age 1800 
+
+Flushing And Evicting
+Flushing: Cache Tier Agent识别出dirty的object，然后更新到后端存储。
+Evicting: 识别出clean的对象，即没有被修改过的，从cache层删除最旧的数据。
+
+ceph osd crush reweight (reweight 为0-1之间)
+reweight只会影响同一故障域内的OSD之间容量配比
+它是做了配比，把部分pg迁移出故障域，好处是reweight对数据改动较少
+
+weight 权重和磁盘的容量相关，一般1T，值为1.000， 500G为0.500
+其和磁盘的容量有关系，不因磁盘的可用空间减少而变化；
+
+osd经常down 状态：
+1、在crush中删除对应的osd信息
+	ceph osd crush remove osd.A 
+2、启动osd服务， 将osd添加回crushmap中；
+	ceph osd crush add A  1.0 host=XX.xx.xx.xx 
+
+ceph tell流程如下：
+	ceph tell osd.0 -> messenger ->dispath() -> handle_command() -> command_wq.queue() -> do_command()
+	-> _conf->injectargs() ->  _applychange() -> obs->handle_conf_change()
+从conf_opts.h文件来看，配置项主要有两类：一类是SUBSYSTEM的，一类是OPTION。
+SUBSYSTEM主要定义了日志子系统写日志的级别。OPTION则主要定义了特定配置项的类型和初始的值。当injectargs的时候可以通过–debug_$
+{system}=int/int 来改变子系统日志的级别。	
+
+
+ceph源码分析：
+1、OS模块（ObjectStore）————— src目录下os文件夹：
+	OSD使用OS模块访问本地存储，os向osd层提供了一个支持事务（transaction）的访问接口，该接口定义
+	在os/ObjectStore.h中，目前os中有多种实现方式，包括基于filesystem+journal的FileStore，基于KV
+	的KeyValueStore,基于内存的MemStore等
+2、
+	
+故障发生后，如果一定时间后重新上线故障 OSD，那么 PG 会进行以下流程:
+	1. 故障 OSD 上线，通知 Monitor 并注册，该 OSD 在上线前会读取存在持久设备的 PGLog，
+	2. Monitor 得知该 OSD 的旧有 id，因此会继续使用以前的 PG 分配，之前该 OSD 下线造成的 Degraded PG 会被通知该 OSD 已重新加入
+	3. 这时候分为两种情况，注意这个情况下 PG 会标志自己为 Peering 状态并暂时停止处理请求:
+	    3.1 第一种情况是故障 OSD 所拥有的 Primary PG
+	    3.1.1 它作为这部分数据"权责"主体，需要发送查询 PG 元数据请求给所有属于该 PG 的 Replicate 角色节点。
+	    3.1.2 该 PG 的 Replicate 角色节点实际上在故障 OSD 下线时期间成为了 Primary 角色并维护了“权威”的 PGLog，该 PG 在得到故障 OSD 的 Primary PG 的查询请求后会发送回应
+	    3.1.3 Primary PG 通过对比 Replicate PG 发送的元数据和 PG 版本信息后发现处于落后状态，因此它会合并得到的 PGLog并建立“权威” PGLog，同时会建立 missing 列表来标记过时数据
+	    3.1.4 Primary PG 在完成“权威” PGLog 的建立后就可以标志自己处于 Active 状态
+
+	    3.2 第二种情况是故障 OSD 所拥有的 Replicate PG
+	    3.2.1 这时上线后故障 OSD 的 Replicate PG 会得到 Primary PG 的查询请求，发送自己这份“过时”的元数据和 PGLog
+	    3.2.2 Primary PG 对比数据后发现该 PG 落后并且过时，比通过 PGLog 建立了 missing 列表
+	    3.2.3 Primary PG 标记自己处于 Active 状态
+	4. PG 开始接受 IO 请求，但是 PG 所属的故障节点仍存在过时数据，故障节点的 Primary PG 会发起 Pull 请求从 Replicate 节点获得最新数据，Replicate PG 会得到其他 OSD 节点上的 Primary PG 的 Push 请求来恢复数据
+	5. 恢复完成后标记自己 Clean
+第三步是 PG 唯一不处理请求的阶段，它通常会在 1s 内完成来减少不可用时间。但是这里仍然有其他问题，比如在恢复期间故障 OSD 会维护 missing 
+列表，如果 IO 正好是处于 missing 列表的数据，那么 PG 会进行恢复数据的“插队”操作，主动将该 IO 涉及的数据从 Replicate PG 
+拉过来，提前恢复该部分数据。这个情况造成的延迟大概在几十毫米，通常来说是可接受的。
+
+永久性故障
+上面的流程的前提故障 OSD 在 PGLog 保存的最大条目数以内加入集群都会利用 PGLog 恢复，那么如果在 N 天之后
+或者发生了永久故障需要新盘加入集群时，PGLog 就无法起到恢复数据的作用，这时候就需要 backfill(全量拷贝) 流程介入。
+backfill 会将所有数据复制到新上线的 PG，这里的流程跟上述过程基本一致，唯一的差异就是在第三步 Primary PG 
+发现 PGLog 已经不足以恢复数据时，这时候同样分为两种情况:
+	故障 OSD 拥有 Primary PG，该 PG 在对比 PGLog 后发现需要全量拷贝数据，那么毫无疑问 Primary PG 在复制
+  期间已经无法处理请求，它会发送一个特殊请求给 Monitor 告知自己需要全量复制，需要将 Replicate PG 临时性提升为 
+  Primary，等到自己完成了复制过程才会重新接管 Primary 角色
+	故障 OSD 拥有 Replicate PG，该 PG 的 Primary 角色会发起 backfill 流程向该 PG 复制数据，由于故障 OSD 是 Replicate 角色，
+  因此不影响正常 IO 的处理
+
+永久性恢复时，需要修改以下参数：
+osd-max-backfills:1
+osd-recovery-threads:1
+osd-recovery-op-priority:1
+osd-client-op-priority:63
+osd-recovery-max-active:1
+osd_recovery_max_single_start：1
+
+术语：
+	Storage Performance Development Kit,存储性能开发工具包， 简称SPDK 
+
+ceph osd crush reweight :设定osd在crush中的权重，这个权重是一个任意值（一般来说是取disk以TB或其他单位的大小），该值控制着ceph为该osd分配多少数据；
+ceph osd crush reweight” sets the CRUSH weight of the OSD. This weight is an arbitrary value (generally the size of the disk in TB or something) 
+	and controls how much data the system tries to allocate to the OSD. 
+
+ceph osd reweight： 
+“ceph osd reweight” sets an override weight on the OSD. This value is in the range 0 to 1, and forces CRUSH to re-place (1-weight) of the data that would 
+otherwise live on this drive. It does not change the weights assigned to the buckets above the OSD, and is a corrective measure in case the normal CRUSH 
+distribution isn’t working out quite right. (For instance, if one of your OSDs is at 90% and the others are at 50%, you could reduce this weight to try and 
+compensate for it.)
+
+
+ceph之watch/notify机制（粒度是object），基于librbd exclusive lock来实现：
+查看磁盘实际使用量：
+	rbd diff rbd/zp |awk '{ SUM += $2}' END { print SUM/1024/1024 " mb"}'
+gdb输入参数命令set args 后面加上程序所要用的参数，注意，不再带有程序名，直接加参数，如：
+set args
+
+BLOB (binary large object)，二进制大对象，是一个可以存储二进制文件的容器。
+
+从上面的流程分析可以知晓，一个I/O在bluestore里经历了多个线程和队列才最终完成，对于非WAL的写，比如对齐写、写到新的blob里等，I/O先写到块设备上，然后元数据提交到rocksdb并sync了，才返回客户端写完成（在STATE_KV_QUEUED状态的处理）；对于WAL（即覆盖写），没有先把数据写块设备，而是将数据和元数据作为wal一起提交到rocksdb并sync后，这样就可以返回客户端写成功了，然后在后面的动作就是将wal里的数据再写到块设备的过程，对这个object的读请求要等到把数据写到块设备完成整个wal写I/O的流程后才行，代码里对应的是_do_read里先o->flush()的操作，所以bluestore里的wal就类似filestore里的journal的作用。
+http://www.tuicool.com/articles/ZV3m6bU
+
+ceph osd map images rbd_data.3b2f23752117.0000000000000f47tunables
+
+
+
+./configure --prefix=/usr --sbindir=/sbin --sysconfdir=/etc
+./do_cmake.sh -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SBINDIR=/sbin -DCMAKE_INSTALL_SYSCONFDIR=/etc
+
+Jewel版本之后版本手动安装：
+	chown -R ceph:ceph /var/lib/ceph/mon/
+	chown -R ceph:ceph /var/run/ceph
+	chown -R ceph:ceph /var/lib/ceph/osd/ceph-{id}
+
+[global]下加
+Tiger 2017/3/29 16:07:22
+osd tracing = true
+	osd objectstore tracing = true
+	rados tracing = true
+	rbd tracing = true
+
+
+Ceph RBD QoS
+Qemu与KVM均提供对网络资源的限制支持，使用libvirt封装的接口可以更方便的实现对rbd设备的资源限制。 libvirt提供如下选项：
+
+total_bytes_sec: 混合模式下的带宽限制
+read_bytes_sec: 顺序读带宽
+write_bytes_sec: 顺序写带宽
+total_iops_sec: 混合模式下的IOPS限制
+read_iops_sec: 随机读IOPS
+write_iops_sec: 随机写IOPS
+使用方法：
+<disk type='network' device='disk'>
+    <driver name='qemu' type='raw' cache='writethrough'/>
+    ...
+    <source protocol='rbd' name='[pool_name]/[image_name]'>
+    ...
+    </source>
+    <iotune>
+      <read_iops_sec>20</read_iops_sec>
+      <write_iops_sec>10</write_iops_sec>
+    </iotune>
+   ...
+</disk>
+在XML文件中添加<iotune>标签，并设置相应的限制值即可
+
+Ext4引入了现代文件系统中流行的 extents 概念，而传统上ext3等之前的文件系统
+使用的间接块(inefficient indirect block)来标记文件内容。
+
+ceph QA：
+1、集群某个osd 挂掉，设置ceph osd set norecover, ceph osd set nobackfill,等；
+	osd节点上设置了自动重启脚本，osd起来之后，设置ceph osd unset norecover, ceph osd unset nobackfill
+	此时集群状态为ok；但是落在该osd的请求会hang住??
+	A: 待解决
+
+ceph性能调试：
+    性能需求：1 core 2G RAM per OSD, 1Ghz CPU * 4 per 4G RAM per MON
+    SSD:SATA: 1: 3~5
+    硬件配置：
+        1、bois设置：
+            - 开启HT
+            - 关闭节能模式
+            - 关闭NUMA
+            - 单盘配置RAID0
+        2、操作系统设置：
+            -  cpu关闭节能模式
+            -  cgroup绑定OSD,MON进程
+            -  关闭numa
+            -  设置vm.swappiness = 0
+            -  ssd调度算法为noop   
+                - 查看sda的调度算法cat /sys/block/sda/queue/scheduler 
+                - 设置sda的调度算法echo "noop" > /sys/block/sda/queue/scheduler
+            -  文件系统挂载参数："noatime nobarrier"
+            -  ssd 分区4k对齐(使用parted 分区，自动4k对齐)
+
+ls /var/run/ceph |grep ceph-osd|grep asok |xargs -n 1 -i ceph daemon  /var/run/ceph/{} config set  osd_scrub_min_interval 1064000
+ls /var/run/ceph |grep ceph-osd|grep asok |xargs -n 1 -i ceph daemon /var/run/ceph/{} config set  osd_scrub_max_interval 9048000
+ls /var/run/ceph |grep ceph-osd|grep asok |xargs -n 1 -i ceph daemon  /var/run/ceph/{} config set  osd_deep_scrub_interval 9048000
+
+vim移动到当前屏幕的首行: H： head 尾行: L：last  中间行：M： middle
+vim关闭其他窗口： ctrl + w + o
+
+linux查看进程启动时间：ps -p 192091 -o lstart
+
+:YcmCompleter GoToDefinitionElseDeclaration
+:YcmCompleter GoToDefinition 
+:YcmCompleter GoToDeclaration" 
+
+
+安装cscope：
+yum install cscope
+建立搜引文件：
+cd code_DIR; cscope -Rbq
+python 项目:cd code_DIR; find ./ -name '*.py' > /tmp/cs.file;  cscope -Rbqk -i /tmp/cs.file
+vim XXX;  执行：cscope show 
+
+如： nmap <C-/>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap 表示在vim的普通模式下，即相对于：编辑模块和可视模式，以下是几种模式
+:map 普通，可视模式及操作符等待模式
+:vmap 可视模式
+:omap 操作符等待模式
+:map! 插入和命令行模式
+:imap 插入模式
+:cmap 命令行模式
+<C-/>表示：Ctrl+/
+<C-R>=expand("cword")总体是为了得到：光标下的变量或函数。cword 表示：cursor word, 类似的还有：cfile表示光标所在处的文件名吧
+＜CR＞＜CR＞就是回车
+
+
+0 或 s   查找本 C 符号(可以跳过注释)
+1 或 g   查找本定义
+2 或 d   查找本函数调用的函数
+3 或 c   查找调用本函数的函数
+4 或 t   查找本字符串
+6 或 e   查找本 egrep 模式
+7 或 f   查找本文件
+8 或 i   查找包含本文件的文件
+
+Google的chubby， Megasotre和Spanner都采用了Paxos来对数据副本的更新序列达成一致；
+Elector::victory() ---->(send msg)
+    Elector::handle_victory()  [recv msg]
+    win_election()
+        leader_init()
+
+#(a<<x):将a的二进制左移x位
+
+#monitor处理消息流程：
+Monitor.dispatch_op #(由flag进行分类处理)
+    ->  #以pgstat为例
+        PGMonitor->dispath(op),
+        ->  PaxosService::dispatch #PGMonitor继承了PaxosService
+            ->  PGMonitor::preprocess_query(op)
+                ->  PGMonitor::preprocess_pg_stats(op)
+                    ->  更新osdmap信息，pgmap信息；
+
+for j in `cat /root/chengpeng/host`; do for i in `cat zhaobinwei/update-hosts`;  do ssh $i "ping $j -c 1 ";done ; done
+
+
+c++ 11新特性：
+    1、override 保留字表示当前函数重写了基类的虚函数；
+
+{"jsonrpc":"2.0","method":"host.create","params":[{"host":"192.168.150.35","available":0,"error":"","name":"6864d863-4be2-4d6c-acf8-53a427fdb24d","status":0,"templates":"10122","groups":[{"groupid":"9"}],"interfaces":[{"dns":"","ip":"192.168.150.35","main":1,"port":"10050","type":1,"useip":1}]}],"auth":"2f27ed0787efc6e268a7d7c6646d406a","id":10}HTTP/1.1 200 OK
+
+
+
+监控项目v1版本存在的问题：
+    1、web后端为单点；
+    2、web前端“添加监控”，等待时间略长，且未做等待处理；
+    3、zabbix agent安装脚本无法兼容ubuntu系列，以及centos6，redhat6版本
+
+docker login -u test -p Test123456 harbor.lisea.cn
+ 
+AutoEncoder
+分类器：罗杰斯特回归， SVM等
+Deep Learning的常用模型和方法：
+    1、AutoEncode(自动编码器)
+    2、Sparse Coding稀疏编码
+    3、Restricted Boltzmann Machine（RBM限制波尔兹曼机）
+    4、Deep BeliefNetworks 深信度网络
+    5、Convolutional Neural Networks 卷积神级网络
+
+
+artificial intelligence
+训练模型的主要过程分为以下4步：
+    1、采用分类的方法得到直接策略。
+    2、直接策略对历史棋局资料库进行 神级网络学习，学习到策略
+    3、采用强化学习的方法进行自我对局来得到改良策略；
+    4、用回归的方法整体统计后得到估值网络
+
+weights 权重 biases 偏差
+
+数据流图， 网络结构图；
+edge, node， graph， session， device，variable， kernel
+边（edge）：
+    张量：
+        任意维度的数据统称为张量[tensor]；
+    残差：
+
+节点（算子）：代表一个operation， OP
+    比如： 数学运算操作： Add/Substract/Multiply/Div/Exp 等等
+           数组运算操作： Concat/Slice/Split/Constant/Rank/Shape/Shuffle
+
+图：
+    构建图的第一步是创建各个节点；（算子）
+    eg： matrix1 = tf.contant([[3., 3.]])
+
+会话：
+    启动图的第一步是创建一个Session对象：
+    一般模式： 1、建立会话，此时会生成一张空图，
+               2、在会话中添加节点和边，形成一张图
+               3、然后执行
+    with tf.Session() as sess:
+        result = sess.run([product])
+        print result
+
+    在调用Session对象的run()方法来执行图时，传入一些Tensor，这个过程叫填充（feed）
+        返回的结果类型根据输入的类型而定，这个过程叫取回(fetch)
+
+    会话主要有两个API接口：Extend 和 Run。
+        Extend操作是在Graph中添加节点和边，
+        Run操作是输入计算的节点和填充必要的数据后，进行计算，并输出计算结果；
+变量：
+    #创建变量张量
+    state = tf.Variable(0, name="counter")
+
+    #创建常量张量
+    input = tf.constant(3.0)
+
+v = tf.get_variable(name, shape, dtype, initializer)
+tf.variable_scope(<scope_name)
+
+tf.get_variable_scope().reuse==False
+
+with tf.variable_scope("foo") as foo_scope:
+    v = tf.get_variable("v", [1])
+with tf.variable_scope(foo_scope)
+    w = tf.get_variable("w", [1])
+
+
+神经元函数：
+    1、激活函数(activation function)
+
+队列、入队节点(enqueue)、出队节点(dequeue)
+    with tf.Session() as sess:
+        sess.run(init)
+        quelen = sess.run(q.size())
+        for i in range(2):
+            sess.run(q_inc)
+
+q = tf.FIFOQueue(1000, "float")
+counter = tf.Variable(0.0)
+increment_op = tf.assign_add(counter, tf.constant(1.0)) 
+enqueue_op = q.enqueue(counter)
+qr = tr.train.QueueRunner(q, enqueue_ops = [increment_op, enqueue_op] * 1)
+
+线程和协调器
+    coordinator   
+
+符号编程框架：1、构建数据流图
+              2、读取数据
+                a、预加载数据(preload data)
+                b、填充数据(feeding)
+                c、从文件读取数据
+              3、模型训练
+
+tensorflow 优化器：
+    1、class tf.train.GradientDescentOptimizer
+
+
+numpy:
+    在numpy中，维度(dimensions)叫做轴，轴的个数叫做秩(rank)
+    [1, 2, 3] 秩为1的数组
+    [[1.,0.,0.], [0.,1.,2.]] 秩为2， 第一个维度长度为2，第二个维度长度为3 #重点理解
+
+
+
+Classification: 分类学习
+卷积神级网络： CNN  【conventional  neural networks】
+    应用： 图片识别，视频识别
+
+RGB：
+
+
+#定义回归模型
+x = tf.placeholder(tf.float32, [None, 784])
+W = tf.Variable(tf.zeros([784, 10]))
+b = tf.Variable(tf.zeros([10]))
+y = tf.matmul(x, W) + b #预测值
+
+1、系统，文件格式，c盘，d盘，
+2、安装软件的流程，做笔记word版本；
+
+增强学习（Reinforcement Learning and Control）
+
+AI 结合游戏：
+    AI在游戏领域的应用主要有两个方面非常值得期待。
+        其中一个是利用AI来进行内容创建。例如，可以用AI的一些算法对图像数据进行识别转化，然后使用深度学习的方法进行超采样的操作，可以非常神奇的解决低分辨率的一些问题，让整个细节更加的真实。又比如人物动画的PFNN（Phase-Functioned Neural Networks）技术，通过大量学习人体动作将捕获的运动数据与场景地形数据相匹配。当游戏中的角色遇到不同的3D场景环境，即可迅速做出情景所需要的正确反应，而且动作非常流畅、自然，几乎如同真人。AI能够完成游戏开发中大量的建模工作，对于一些非人物角色，AI的完成效果可能更好，甚至能够提高游戏的完成度与复杂程度。
+        另一个广阔的领域在于游戏中的玩家和NPC的AI技术，例如玩家已经可以使用AI技术来打Doom的游戏，而俄罗斯的一家公司走的更远，他们创造了一个叫Boris的AI系统，它能在即时战略游戏里像人类一样思考去打仗。
+
+2016年，OpenAI 用《侠盗猎车手5》开发出了一个名叫DeepDrive 的“自动驾驶模拟器”。通过读取GTA游戏内的车辆内部数据，OpenAI 将这些数据用来训练自动驾驶系统。通过这件事可以看出，将人工智能用于游戏测试后，也同样具有了重要的现实意义。
+
+辅助制作：素材快速生成
+    游戏设计领域可以利用人工智能，在已经设定好基础规则的前提下观察更多可能性，从而影响到游戏开发的整体进程，而在制作阶段，同样可以利用人工智能的深度学习能力，进行快速制作。
+    通过机器和神经网络技术，对卷积神经网络（一种人工智能，可处理大型图片）进行大量的图片训练，尤其是针对图片纹理进行大量训练后，该神经网路就可以在很短的时间内将这种图片纹理应用到另一张图片上并渲染完毕，生成素材。
+    如果说，在训练过程中人们一直训练AI辨识梵高的画作《星夜》，那么在AI学习之后给其提供一张现实中的照片，AI很快就会为我们将这张照片变成《星夜》风格的画作。如果将此类过程应用到游戏中，只需要由美工人员设计好场景的摆放，之后将纹理素材图片拍摄下来，能够在短时间内大量生成美术人员所需的图片素材。要知道，布景和贴图向来是开发中最耗时的工作。
+    除了快速生成美术素材，游戏中的声音处理也同样能够依法炮制。
+
+
+比赛平台：ViZDoom  简而言之，就是研究者可以通过这个环境直接访问到Doom的游戏引擎，以此来训练自己的算法。算法可以的到游戏画面帧作为输入：

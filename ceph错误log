@@ -1,2 +1,0 @@
-     0> 2016-12-05 19:27:32.534355 7fe922632700 -1 os/FileStore.cc: In function 'virtual int FileStore::read(coll_t, const ghobject_t&, uint64_t, size_t, ceph::bufferlist&, bool)' thread 7fe922632700 time 2016-12-05 19:27:32.379776
-os/FileStore.cc: 2641: FAILED assert(allow_eio || !m_filestore_fail_eio || got != -5)

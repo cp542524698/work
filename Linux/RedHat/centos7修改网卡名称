@@ -1,0 +1,23 @@
+1、vim /etc/sysconfig/grub
+  在GRUB_CMDLINE_LINUX一行中添加net.ifnames=0 biosdevname=0
+  GRUB_CMDLINE_LINUX="rd.lvm.lv=rhel/swap crashkernel=auto rd.lvm.lv=rhel/root net.ifnames=0 biosdevname=0 rhgb quiet"
+2、执行：
+  grub2-mkconfig -o /boot/grub2/grub.cfg
+3、mv /etc/sysconfig/network-scripts/ifcfg-XXXX /etc/sysconfig/network-scripts/ifcfg-eth0
+4、vim /etc/sysconfig/network-scripts/ifcfg-eth0
+    NAME=eth1
+    DEVICE=eth1
+5、reboot 
+
+配置静态ip：
+1、vim /etc/sysconfig/network-scripts/ifcfg-eth0
+  TYPE=Ethernet
+  BOOTPROTO=static
+  NAME=eth0
+  DEVICE=eth0
+  ONBOOT=yes
+  IPADDR=192.168.83.101
+  GATEWAY=192.168.83.1
+  NETMASK=255.255.255.0
+  DNS1=8.8.8.8
+  DNS2=114.114.114.114

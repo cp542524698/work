@@ -1,0 +1,78 @@
+kilo admin认证：（请求端口为：35357，而非5000）
+    curl -v -X POST -d @request.json -H "Content-type: application/json" http://localhost:35357/v3/auth/tokens
+    request.json:
+      {
+          "auth": {
+              "identity": {
+                  "methods": [
+                      "password"
+                  ],
+                  "password": {
+                      "user": {
+                              "domain":{
+                                      "name":"default"
+                              },
+                              "name": "admin",
+                              "password": "be5e5bf0ce0b542fe"
+                      }
+                  }
+              },
+              "scope": {
+                  "project": {
+                      "domain":{
+                              "name":"default"
+                      },
+                      "name": "admin"
+                  }
+              }
+          }
+       }
+return:
+  * About to connect() to localhost port 35357 (#0)
+*   Trying ::1...
+* 拒绝连接
+*   Trying 127.0.0.1...
+* Connected to localhost (127.0.0.1) port 35357 (#0)
+> POST /v3/auth/tokens HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: localhost:35357
+> Accept: */*
+> Content-type: application/json
+> Content-Length: 578
+> 
+* upload completely sent off: 578 out of 578 bytes
+< HTTP/1.1 201 Created
+< X-Subject-Token: 321e5fe9f2144652adc144e3cdd30235     #token 在这里，http header
+< Vary: X-Auth-Token
+< Content-Type: application/json
+< Content-Length: 5514
+< X-Openstack-Request-Id: req-4406b493-c73e-4d41-9d09-c849f9848c1f
+< Date: Tue, 06 Jun 2017 02:31:51 GMT
+< 
+{
+    "token": {
+        "audit_ids": [
+            "iCpOL49CSNCv-0LlUkPKsA"
+        ],
+        "catalog": [
+            {
+                "endpoints": [
+                    {
+                        "id": "045575b1db24492f8312345999ac88b3",
+                        "interface": "admin",
+                        "region": "songjiang",
+                        ......
+                "name": "admin"
+            }
+        ],
+        "user": {
+            "domain": {
+                "id": "default",
+                "name": "Default"
+            },
+            "id": "c735b9e436a04895b0ef35051a7af0d6",
+            "name": "admin"
+        }
+    }
+}
+
