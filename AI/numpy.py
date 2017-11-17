@@ -62,5 +62,5 @@ hsplit, vsplit, dsplit, split
   itemsize： 数组中元素所占用内存；
   nbytes: 整个数组所占用的空间；
   T：     数组转秩
- ![](https://github.com/cp542524698/work/blob/master/AI/np_ndarray.png)
+![image](https://github.com/cp542524698/work/blob/master/AI/np_ndarray.png)
   
