@@ -5,6 +5,7 @@ Help and Manual6 破解码：
     
 osd_max_backfills = 1 		#每个OSD上面启动的恢复的PG数目
 osd_recovery_max_active = 3     #控制同时恢复的请求数目
+recovery的时候设置为1为佳：osd_recovery_max_active = 1
 
 ceph卡在active+remapped状态：
 执行：ceph osd crush reweight XX即可ok
