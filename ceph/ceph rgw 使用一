@@ -1,3 +1,0 @@
-http://lists.ceph.com/pipermail/ceph-users-ceph.com
-创建s3用户：
-  radosgw-admin user create --uid="test" --display-name="Second"

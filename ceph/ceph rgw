@@ -1,0 +1,19 @@
+http://lists.ceph.com/pipermail/ceph-users-ceph.com
+创建s3用户：
+  radosgw-admin user create --uid="test" --display-name="Second"
+ceph rgw优秀博文：
+  1、rgw索引分片：
+  http://blog.csdn.net/ganggexiongqi/article/details/51202621
+  2、rgw placement target
+  http://blog.csdn.net/ganggexiongqi/article/details/50477307
+  3、rgw防盗链
+  http://blog.csdn.net/u011542994/article/details/54134566
+  4、rgw admin op api
+  http://blog.csdn.net/for_tech/article/details/63252053
+  5、rgw 对象寻址
+  http://blog.csdn.net/ganggexiongqi/article/details/68922663
+  6、rgw cache
+  http://blog.csdn.net/ganggexiongqi/article/details/51314574
+  7、rgw QA
+  http://blog.csdn.net/jeegnchen/article/details/50830728
+  8、
