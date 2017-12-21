@@ -1,6 +1,6 @@
 
 iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-
+Kjfnaf8472
 
 wireshark：
 	过滤条件：
@@ -4501,6 +4501,22 @@ cinder type-list
 cinder extra-specs-list
 ceph用户管理：
 
+云上云优化之处：
+1、注册之后无法跳转；
+2、注册的用户名、密码要求过于复杂；
+3、没有浏览器记住功能；
+4、多家云服务商之间的直接切换；
+5、panel布局问题，需要调整
+
+create table network (
+	`id` int(11) NOT NULL AUTO_INCREMENT, 
+	`networkid` 	 char(36) NOT NULL,
+	`networkLabel`   varchar(128) NOT NULL, f
+	`description`    varchar(256) NOT NULL,    
+	PRIMARY KEY(`id`, `networkid`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-	
+insert into network('networkid','networkLabel', 'description')values()
+
+nova boot --flavor 10001 add_by_api --image 7ed9a796-6b68-4496-a3bd-ec0bbea4f9f5  --nic net-id=fbd6c6d8-2fcf-4cb0-af28-e0a886aa778f   --availability-zone  ACTIVE
