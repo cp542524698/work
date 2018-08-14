@@ -2,10 +2,24 @@
 	就是向rados中写入一些key/value对，记录image的元数据。(必须加--image-format 2)
 	rbd create test --size 10240 --order 22 --pool rbd  --image-format 2
 	生成这两个重要的object：
-	rbd_id.test  						---- rbd_id.{image name}
-	rbd_header.93e5c2ae8944a			---- rbd_header.{image id}
-	rbd_directory
-
+	rbd_id.test  					---- rbd_id.{image name} 这是个key， 由此找到其value为"93e5c2ae8944a"
+	rbd_header.93e5c2ae8944a			---- rbd_header.{image id} 这也是key，由此找到其value；
+	rbd_directory					---- 同样是key，由此找到其value；
+	//rbd_id.test的值: 记录image name到image id的映射,image id是用rand()函数，按一定规则生成
+	//rbd_header.{image id}: 记录元信息: Order是用来计算block size，如order为22，block size为1<<22 = 4M
+		- size : 10240
+		- order : 22
+		- object_prefix: rbd_data.93e5c2ae8944a
+		- snap_seq: 0
+	//rbd_directory中记录了所有image的name和id的双向映射关系;
+	eg:
+		......
+		name_foo: 
+		id_1d3e74b0dc51
+		Id_1d3e74b0dc51: 
+		name_foo
+		......
+	
 	#rados -p rbd ls
 		rbd_id.test
 		rbd_header.93e5c2ae8944a
