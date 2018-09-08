@@ -17,7 +17,7 @@
 ### <h2 id="changjing">[使用场景分析](#title)</h2>
 ![](https://oaa8c7nvd.qnssl.com/bi21_needblockchain.png)
 
-### <h2 id="fangxiang">应用方向</h2>
+### <h2 id="fangxiang"> [应用方向](#title) </h2>
 - 去中心化的云存储（filecoin）
 -  以太猫 & fomo 3d & steemit
 -  数字货币和支付
