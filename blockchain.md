@@ -1,23 +1,22 @@
 ## 区块链
-* [1.使用场景分析](#changjing)
+* [使用场景分析](#changjing)
 
-* [2.应用方向](#fangxiang)
+* [应用方向](#fangxiang)
 
-* [3.区块链平台 -  比特币 & 以太坊 & EOS](#plat)
+* [区块链平台 -  比特币 & 以太坊 & EOS](#plat)
 
-* [4.强调](#1.3)
+* [什么是区块链](#what)
 
-* [5.什么是区块链](#what)
+* [为什么是区块链](#why)
 
-* [6.为什么是区块链](#why)
+* [区块链是如何运转](#how)
 
-* [7.区块链是如何运转](#how)
+* [区块链的不足](#end)
 
-* [8.区块链的不足](#end)
-
-### <h2 id="changjing">1.使用场景分析</h2>
+### <h2 id="changjing">使用场景分析</h2>
 ![](https://oaa8c7nvd.qnssl.com/bi21_needblockchain.png)
-### [应用方向](#fangxiang)
+
+### <h2 id="fangxiang">应用方向</h2>
 - 去中心化的云存储（filecoin）
 -  以太猫 & fomo 3d & steemit
 -  数字货币和支付
@@ -25,12 +24,12 @@
 -  跨境银行间清算，金融保险服务
 - other
 
-### [区块链平台 -  比特币 & 以太坊 & EOS](#plat)
+### <h2 id="plat"> 区块链平台 - 比特币 & 以太坊 & EOS </h2>
 - btc：基于点对点技术的去中心化数字货币（区块链1.0）
 - eth : 可编程 + btc（区块链2.0）
 - EOS： 待考证（区块链3.0 ？）
 
-### [WHAT](#what) 
+### <h2 id="what"> WHAT </h2>
 分布式数据库
 - 功能：
 	- 数据存储
@@ -41,7 +40,7 @@
     
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122702.png)
 
-### [WHY](#why)
+### <h2 id="why"> WHY </h2>
 因为它是由一个个记录着各种信息的小区块链接起来组成的一个链条
 
 
@@ -56,7 +55,7 @@
 
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122704.png)
 
-### [HOW](#how)
+### <h2 id="how"> how </h2>
 - 基本概念
 	- 创世区块
 	- P2P network
@@ -99,7 +98,7 @@ NOTE: p2p 网络 + 共识机制 实现去中心化的基石
 	- N 次确认
 		交易区块后，达成N个区块
 
-[区块链的劣势分析](#end)
+### <h2 id="end"> 区块链的劣势分析 <h2>
 - 51%攻击
 - 隐私安全（private key missing）
 - tps 效率太低
