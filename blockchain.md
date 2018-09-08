@@ -25,12 +25,12 @@
 -  跨境银行间清算，金融保险服务
 - other
 
-### <h2 id="plat"> 区块链平台 - 比特币 & 以太坊 & EOS </h2>
+### <h2 id="plat"> [区块链平台 - 比特币 & 以太坊 & EOS](#title) </h2>
 - btc：基于点对点技术的去中心化数字货币（区块链1.0）
 - eth : 可编程 + btc（区块链2.0）
 - EOS： 待考证（区块链3.0 ？）
 
-### <h2 id="what"> WHAT </h2>
+### <h2 id="what"> [WHAT](#title) </h2>
 分布式数据库
 - 功能：
 	- 数据存储
@@ -41,22 +41,22 @@
     
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122702.png)
 
-### <h2 id="why"> WHY </h2>
+### <h2 id="why"> [WHY](#title) </h2>
 因为它是由一个个记录着各种信息的小区块链接起来组成的一个链条
 
 
 ![â€œblockchainâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEWtR_BPlW81rXxwDwL6GTgjRRBZj0GE2j0pAvhvLttZyIV7ZQ)
 
 
-**绿色块: 分叉块**
-**橙色块: 创世块**
-**蓝色块: 普通区块**
+- **绿色块: 分叉块**
+- **橙色块: 创世块**
+- **蓝色块: 普通区块**
 
 - 区块（block）介绍
 
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122704.png)
 
-### <h2 id="how"> how </h2>
+### <h2 id="how"> [how](#title) </h2>
 - 基本概念
 	- 创世区块
 	- P2P network
@@ -97,7 +97,7 @@ NOTE: p2p 网络 + 共识机制 实现去中心化的基石
 	- N 次确认
 		交易区块后，达成N个区块
 
-### <h2 id="end"> 区块链的劣势分析 </h2>
+### <h2 id="end"> [区块链的劣势分析](#title) </h2>
 - 51%攻击
 - 隐私安全（private key missing）
 - tps 效率太低
