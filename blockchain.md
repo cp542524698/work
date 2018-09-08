@@ -48,9 +48,9 @@
 ![â€œblockchainâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEWtR_BPlW81rXxwDwL6GTgjRRBZj0GE2j0pAvhvLttZyIV7ZQ)
 
 
-- **绿色块: 分叉块**
-- **橙色块: 创世块**
-- **蓝色块: 普通区块**
+	- **绿色块: 分叉块**
+	- **橙色块: 创世块**
+	- **蓝色块: 普通区块**
 
 - 区块（block）介绍
 
@@ -95,7 +95,9 @@ NOTE: p2p 网络 + 共识机制 实现去中心化的基石
 
 - 最长链原则
 
-系统层面的临时分叉![â€œåŒºå—é“¾åˆ†å‰â€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://static.leiphone.com/uploads/new/article/740_740/201711/5a1411175e94b.jpg?imageMogr2/format/jpg/quality/90)
+系统层面的临时分叉
+
+![â€œåŒºå—é“¾åˆ†å‰â€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://static.leiphone.com/uploads/new/article/740_740/201711/5a1411175e94b.jpg?imageMogr2/format/jpg/quality/90)
 
 	- N 次确认
 		交易区块后，达成N个区块
