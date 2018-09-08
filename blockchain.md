@@ -27,7 +27,10 @@
 
 ###  WHY
 因为它是由一个个记录着各种信息的小区块链接起来组成的一个链条
+
+
 ![â€œblockchainâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEWtR_BPlW81rXxwDwL6GTgjRRBZj0GE2j0pAvhvLttZyIV7ZQ)
+
 
 **绿色块: 分叉块**
 **橙色块: 创世块**
