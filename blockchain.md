@@ -70,7 +70,6 @@
 	- 中心化网络
 	
 ![â€œp2p networkâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://1.bp.blogspot.com/-gsabUTW6lM8/T0X4RAUfZKI/AAAAAAAAFAs/9HZwJDYw3jU/s640/New+Variant+of+the+Zeusbot+Spyeye+Botnet+uses+p2p+network+model.jpg)
-
 	- P2P 网络
 	
 ![â€œp2p networkâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](http://techdifferences.com/wp-content/uploads/2017/01/Peer-to-Peer.jpg)
