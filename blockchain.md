@@ -75,6 +75,7 @@
 ![â€œp2p networkâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](http://techdifferences.com/wp-content/uploads/2017/01/Peer-to-Peer.jpg)
 
 - 共识机制
+
 用于维护系统的运作顺序与公平性，统一区块链的版本，并奖励提供资源维护区块链的使用者，以及惩罚恶意的危害者；
 
 	- 常见的共识算法:
@@ -85,6 +86,7 @@
 NOTE: p2p 网络 + 共识机制 实现去中心化的基石	
 
 - 挖矿
+
 全世界的沙子里面，找到一粒符合条件的沙子。计算哈希的机器就叫做矿机，操作矿机的人就叫做矿工。
 	- 挖矿成功用于操作分布式数据库的权利
 	- 获取奖励（包括系统的token + 交易的矿工费）
@@ -92,7 +94,8 @@ NOTE: p2p 网络 + 共识机制 实现去中心化的基石
 *NOTE: 比特币区块链的token就是比特币* 
 
 - 最长链原则
-	系统层面的临时分叉![â€œåŒºå—é“¾åˆ†å‰â€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://static.leiphone.com/uploads/new/article/740_740/201711/5a1411175e94b.jpg?imageMogr2/format/jpg/quality/90)
+
+系统层面的临时分叉![â€œåŒºå—é“¾åˆ†å‰â€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://static.leiphone.com/uploads/new/article/740_740/201711/5a1411175e94b.jpg?imageMogr2/format/jpg/quality/90)
 
 	- N 次确认
 		交易区块后，达成N个区块
