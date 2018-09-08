@@ -22,6 +22,7 @@
 	-  去中心化
 	- 	无法篡改以及加密安全性
     -   无须第三方信任系统
+    
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122702.png)
 
 ###  WHY
@@ -31,7 +32,9 @@
 **绿色块: 分叉块**
 **橙色块: 创世块**
 **蓝色块: 普通区块**
+
 - 区块（block）介绍
+
 ![](http://www.ruanyifeng.com/blogimg/asset/2017/bg2017122704.png)
 
 ### HOW
@@ -47,9 +50,11 @@
 
 - P2P network
 	- 中心化网络
+	
 ![â€œp2p networkâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](https://1.bp.blogspot.com/-gsabUTW6lM8/T0X4RAUfZKI/AAAAAAAAFAs/9HZwJDYw3jU/s640/New+Variant+of+the+Zeusbot+Spyeye+Botnet+uses+p2p+network+model.jpg)
 
 	- P2P 网络
+	
 ![â€œp2p networkâ€çš„å›¾ç‰‡æœç´¢ç»“æžœ](http://techdifferences.com/wp-content/uploads/2017/01/Peer-to-Peer.jpg)
 
 - 共识机制
