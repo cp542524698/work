@@ -1,5 +1,14 @@
 
 ## 区块链
+
+      * [<a id="user-content-使用场景分析" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90"></a>使用场景分析](#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90)
+      * [<a id="user-content-应用方向" href="#%E5%BA%94%E7%94%A8%E6%96%B9%E5%90%91"></a>应用方向](#%E5%BA%94%E7%94%A8%E6%96%B9%E5%90%91)
+      * [<a id="user-content-区块链平台----比特币--以太坊--eos" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%B9%B3%E5%8F%B0----%E6%AF%94%E7%89%B9%E5%B8%81--%E4%BB%A5%E5%A4%AA%E5%9D%8A--eos"></a>区块链平台 -  比特币 &amp; 以太坊 &amp; EOS](#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%B9%B3%E5%8F%B0----%E6%AF%94%E7%89%B9%E5%B8%81--%E4%BB%A5%E5%A4%AA%E5%9D%8A--eos)
+      * [<a id="user-content-what" href="#what"></a>WHAT](#what)
+      * [<a id="user-content-why" href="#why"></a>WHY](#why)
+      * [<a id="user-content-how" href="#how"></a>HOW](#how)
+      * [<a id="user-content-区块链的劣势分析" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%8A%A3%E5%8A%BF%E5%88%86%E6%9E%90"></a>区块链的劣势分析](#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%8A%A3%E5%8A%BF%E5%88%86%E6%9E%90)
+
 ### 使用场景分析
 ![](https://oaa8c7nvd.qnssl.com/bi21_needblockchain.png)
 ### 应用方向
@@ -91,12 +100,5 @@ NOTE: p2p 网络 + 共识机制 实现去中心化的基石
 - 区块容量
 
 
-    * [<a id="user-content-区块链" href="#%E5%8C%BA%E5%9D%97%E9%93%BE"></a>区块链](#%E5%8C%BA%E5%9D%97%E9%93%BE)
-      * [<a id="user-content-使用场景分析" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90"></a>使用场景分析](#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90)
-      * [<a id="user-content-应用方向" href="#%E5%BA%94%E7%94%A8%E6%96%B9%E5%90%91"></a>应用方向](#%E5%BA%94%E7%94%A8%E6%96%B9%E5%90%91)
-      * [<a id="user-content-区块链平台----比特币--以太坊--eos" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%B9%B3%E5%8F%B0----%E6%AF%94%E7%89%B9%E5%B8%81--%E4%BB%A5%E5%A4%AA%E5%9D%8A--eos"></a>区块链平台 -  比特币 &amp; 以太坊 &amp; EOS](#%E5%8C%BA%E5%9D%97%E9%93%BE%E5%B9%B3%E5%8F%B0----%E6%AF%94%E7%89%B9%E5%B8%81--%E4%BB%A5%E5%A4%AA%E5%9D%8A--eos)
-      * [<a id="user-content-what" href="#what"></a>WHAT](#what)
-      * [<a id="user-content-why" href="#why"></a>WHY](#why)
-      * [<a id="user-content-how" href="#how"></a>HOW](#how)
-      * [<a id="user-content-区块链的劣势分析" href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%8A%A3%E5%8A%BF%E5%88%86%E6%9E%90"></a>区块链的劣势分析](#%E5%8C%BA%E5%9D%97%E9%93%BE%E7%9A%84%E5%8A%A3%E5%8A%BF%E5%88%86%E6%9E%90)
+
 
