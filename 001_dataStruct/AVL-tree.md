@@ -26,10 +26,9 @@
     - 处理目标节点为根的子树来达到平衡【通过旋转】
  
 ### 平衡二叉树的平衡调整（旋转）的四种类型：
-![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate.png)
-
   - 新增节点在根的左子树的左子树上（加在该节点的左边/右边）【LL旋转】
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_LL_rorate.png) 
+  ==
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_LL_2.png) 
   - 新增节点在根的左子树的右子树上（加在该节点的左边/右边）【LR旋转】
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_LR.png)  
@@ -38,6 +37,7 @@
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RL.png)  
 
   - 新增节点在根的右子树的右子树【RR旋转】
-![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RR.png)  
+![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RR.png) 
+  ==
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RR_2.png)  
   
