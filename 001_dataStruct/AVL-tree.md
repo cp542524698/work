@@ -17,9 +17,9 @@
 ###  平衡二叉树的插入
     当在平衡二叉树上插入一个节点时，有可能导致该树"失衡", 这时候就需要通过旋转来使之恢复平衡
     
-    ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_insert.png)
+![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_insert.png)
 
 ### 平衡二叉树的平衡调整（旋转）的四种类型：
 
-    ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate.png)
+![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate.png)
     
