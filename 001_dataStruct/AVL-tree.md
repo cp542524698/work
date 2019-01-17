@@ -31,10 +31,11 @@
   ==
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_LL_2.png) 
   - 新增节点在根的左子树的右子树上（加在该节点的左边/右边）【LR旋转】
-![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_LR.png)  
+![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RL.png)  
+  
 
   - 新增节点在根的右子树的左子树上【RL旋转】
-![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RL.png)  
+![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_LR.png)
 
   - 新增节点在根的右子树的右子树【RR旋转】
 ![avatar](https://github.com/tianser/work/blob/master/001_dataStruct/pic/avl_rorate_RR.png) 
