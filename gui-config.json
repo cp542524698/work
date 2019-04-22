@@ -1,0 +1,107 @@
+{
+"configs" : [
+  {
+"server" : "hka18.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "香港a18"}
+,
+  {
+"server" : "jpa1.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "东京a1"}
+,
+  {
+"server" : "gcehk8.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "香港g8[BGP]"}
+,
+  {
+"server" : "gcetw2.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "中国台湾2[BGP]"}
+,
+  {
+"server" : "kes3.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "韩国s3[BGP]"}
+,
+  {
+"server" : "kec12.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "韩国c12[BGP]"}
+,
+  {
+"server" : "usc12.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "美国c12[CN2]"}
+,
+  {
+"server" : "sga7.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "新加坡a7"}
+,
+  {
+"server" : "bjg3.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "北京[BGP]"}
+,
+  {
+"server" : "bja9.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "北京->日本a9"}
+,
+  {
+"server" : "usb8.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "美国b8"}
+,
+  {
+"server" : "hzg2.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "深圳[BGP]"}
+,
+  {
+"server" : "hkc7.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "香港c7[CN2]"}
+,
+  {
+"server" : "jph7.abcxs.top",
+"server_port" : 53013,
+"password" : "3SM5wNam",
+"method" : "rc4-md5",
+"remarks" : "日本h7"}
+
+],
+"index" : 0,
+"global" : false,
+"enabled" : false,
+"shareOverLan" : true,
+"isDefault" : false,
+"localPort" : 2055}
