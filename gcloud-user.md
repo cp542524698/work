@@ -38,3 +38,19 @@
 //resp
 {"code":0,"data":null,"message":"success"}
 ```
+- 获取指定用户详细信息 【uri: /api/v1/account/{region}/{instanceId}/{username}/info GET】
+```shell
+//resp
+{
+    "code": 0,
+    "data": {
+        "dbs": [
+            "myDB",
+            "myDB2"
+        ],
+        "host": "%",
+        "user": "testA"
+    },
+    "message": "success"
+}
+```
